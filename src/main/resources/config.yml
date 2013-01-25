@@ -1,0 +1,3 @@
+useLogger: false
+logger:
+  - format: plain
