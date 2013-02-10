@@ -7,7 +7,7 @@ softdepend: [FuzzyLog]
 commands:
   pm:
     description: Private message a player
-    aliases: [tell,whisper,msg]
+    aliases: [tell,whisper,msg,w]
     permission: fuzzymessenger.pm.send
   r:
     description: Reply to a message
