@@ -29,6 +29,7 @@ package be.darnell.mc.FuzzyMessenger;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
@@ -46,7 +47,7 @@ public class FuzzyMessengerListener implements Listener {
     this.plugin = plugin;
   }
 
-  @EventHandler
+  @EventHandler(priority = EventPriority.LOWEST)
   public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
     if (plugin.mutees.contains(event.getPlayer().getName())) {
       event.setCancelled(true);
