@@ -26,16 +26,17 @@
  */
 package be.darnell.mc.FuzzyMessenger;
 
+import be.darnell.mc.FuzzyMessenger.commands.*;
+
 import be.darnell.mc.FuzzyLog.FuzzyLog;
 import be.darnell.mc.FuzzyLog.LogFacility;
-import java.io.File;
+
+import java.io.*;
 import java.util.HashSet;
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
+import java.util.Set;
+
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -44,10 +45,10 @@ import org.bukkit.plugin.java.JavaPlugin;
  *
  * @author cedeel
  */
-public class FuzzyMessenger extends JavaPlugin {
+public final class FuzzyMessenger extends JavaPlugin {
 
     private final FuzzyMessengerListener listener = new FuzzyMessengerListener(this);
-    protected HashSet<String> mutees = new HashSet<String>();
+    private static HashSet<String> mutees = new HashSet<String>();
     protected WordFilter filter = new WordFilter(new File(getDataFolder(), "badwords.txt"), new File(getDataFolder(), "replacements.txt"));
     protected PrivateMessaging pm = new PrivateMessaging(this);
     protected LogFacility logger;
@@ -55,8 +56,8 @@ public class FuzzyMessenger extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        PluginManager pmgr = getServer().getPluginManager();
-        pmgr.registerEvents(listener, this);
+        PluginManager pluginManager = getServer().getPluginManager();
+        pluginManager.registerEvents(listener, this);
         FileConfiguration fc = getConfig();
         useLogger = fc.getBoolean("useLogger");
         if (useLogger) {
@@ -68,202 +69,65 @@ public class FuzzyMessenger extends JavaPlugin {
                 useLogger = false;
             }
         }
+
+        mutees = loadMutees();
+        registerCommands();
     }
 
     @Override
     public void onDisable() {
         saveConfig();
+        saveMutees();
     }
 
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        String cmd = command.getName().toLowerCase();
-
-
-        // switch (command.getName().toLowerCase()) {
-        if (cmd.equals("mute")) {
-            if (args.length == 1) {
-                return mute(sender, args[0]);
-            } else {
-                sender.sendMessage(ChatColor.GOLD + "Usage: /mute <player>");
-            }
-        } else if (cmd.equals("unmute")) {
-            if (args.length == 1) {
-                return unmute(sender, args[0]);
-            } else {
-                sender.sendMessage(ChatColor.GOLD + "Usage: /unmute <player>");
-            }
-        } else if (cmd.equals("ismuted")) {
-            if (args.length == 1) {
-                Player player = getServer().getPlayer(args[0]);
-                if (isMuted(args[0])) {
-                    sender.sendMessage(ChatColor.RED + player.getName()
-                            + ChatColor.GOLD + " is muted.");
-                } else {
-                    sender.sendMessage(ChatColor.GREEN + player.getName()
-                            + ChatColor.GOLD + " is not muted.");
-                }
-                return true;
-            } else {
-                sender.sendMessage(ChatColor.GOLD
-                        + "Usage: /ismuted <player>");
-                return false;
-            }
-        } else if (cmd.equals("mutees")) {
-            int page = 1;
-            if (args.length >= 1) {
-                try {
-                    page = Integer.parseInt(args[0]);
-                } catch (NumberFormatException e) {
-                }
-            }
-            sendMutees(sender, page);
-            return true;
-        }
-        if (cmd.equals("pm")) {
-            if (args.length > 1) {
-                String message = constructMessage(args, 1);
-                return pm.sendMessage(sender, args[0], message);
-            }
-            sender.sendMessage(ChatColor.GOLD
-                    + "Usage: /pm <recipient> <message>");
-        }
-
-        if (cmd.equals("r")) {
-            if (args.length >= 1) {
-                return pm.replyMessage(sender, constructMessage(args, 0));
-            }
-        }
-        if (cmd.equals("snoop")) {
-            if (args.length == 1) {
-                if (sender instanceof Player) {
-                    Player player = (Player) sender;
-                    if (player.hasPermission("fuzzymessenger.pm.snoop")) {
-                        if (args[0].equalsIgnoreCase("on")) {
-                            if (!pm.isSnooper(player)) {
-                                pm.addSnooper(player);
-                                sender.sendMessage(
-                                        ChatColor.GREEN
-                                        + "PM snooping enabled.");
-                            } else {
-                                player.sendMessage(
-                                        ChatColor.YELLOW
-                                        + "PM snooping already enabled.");
-                            }
-                        } else if (args[0].equalsIgnoreCase("off")) {
-                            if (pm.isSnooper(player)) {
-                                pm.removeSnooper(player);
-                                sender.sendMessage(
-                                        ChatColor.GREEN
-                                        + "PM snooping disabled.");
-                            } else {
-                                player.sendMessage(
-                                        ChatColor.YELLOW
-                                        + "PM snooping not enabled.");
-                            }
-                        }
-                    }
-                } else if (sender instanceof ConsoleCommandSender) {
-                    sender.sendMessage("No snooping for console :P");
-                }
-            } else {
-                sender.sendMessage(ChatColor.GOLD
-                        + "Usage: /snoop [on,off]");
-            }
-        }
-        if (cmd.equals("me")) {
-            emote(sender, constructMessage(args, 0));
-            return true;
-
-        }
-
-        return false;
+    public static boolean addMutee(String mutee) {
+        return mutees.add(mutee);
     }
 
-    private boolean mute(CommandSender sender, String player) {
-        if (sender.hasPermission("fuzzymessenger.mute")) {
-            try {
-                String mutee = getServer().getPlayer(player).getName();
-                mutees.add(mutee);
-                getServer().broadcastMessage(ChatColor.DARK_RED + mutee
-                        + ChatColor.AQUA + " has been muted by "
-                        + ChatColor.GOLD + sender.getName());
-            } catch (NullPointerException e) {
-                sender.sendMessage("Player not found.");
-                return false;
-            }
-        } else {
-            sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
-        }
-        return true;
+    public static boolean removeMutee(String mutee) {
+        return mutees.remove(mutee);
     }
 
-    private boolean unmute(CommandSender sender, String player) {
-        if (sender.hasPermission("fuzzymessenger.mute")) {
-            // OfflinePlayer mutee = getServer().getOfflinePlayer(player);
-            try {
-                mutees.remove(player);
-                getServer().broadcastMessage(ChatColor.DARK_RED + player
-                        + ChatColor.AQUA + " has been unmuted by "
-                        + ChatColor.GOLD + sender.getName());
-            } catch (Exception e) {
-                sender.sendMessage(player + " not found or not muted");
-            }
-        } else {
-            sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
-        }
-        return true;
+    public static Set<String> getMutees() {
+        return mutees;
     }
 
-    private String constructMessage(String[] message, int offset) {
-        String m = "";
-        for (int i = offset; i < message.length; i++) {
-            m = m + " " + message[i];
-        }
-        return m.trim();
-    }
-
-    private void emote(CommandSender sender, String message) {
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-            if (player.hasPermission("fuzzymessenger.me")) {
-                if (mutees.contains(player.getName())) {
-                    player.sendMessage(ChatColor.RED + "You can't use emotes while muted.");
-                } else {
-                    this.getServer().broadcastMessage(ChatColor.DARK_GRAY + "* "
-                            + ChatColor.WHITE + player.getDisplayName()
-                            + " " + message + ChatColor.DARK_GRAY + " *");
-                }
-            } else {
-                player.sendMessage(ChatColor.RED + "You don't have permission to use emotes.");
-            }
-        } else {
-            this.getServer().broadcastMessage(ChatColor.DARK_GRAY + "* "
-                    + ChatColor.WHITE + "Console "
-                    + message
-                    + ChatColor.DARK_GRAY + " *");
-        }
-    }
-
-    private void sendMutees(CommandSender sender, int page) {
-        if (sender.hasPermission("fuzzymessenger.mute")) {
-            sender.sendMessage(ChatColor.GOLD + "Muted players:");
-            StringBuilder sb = new StringBuilder(48);
-            sb.append(ChatColor.DARK_RED);
-            try {
-                for (String p : mutees) {
-                    sb.append(p).append(", ");
-                }
-            } catch (NullPointerException e) {
-            }
-            sender.sendMessage(sb.toString());
-        } else {
-            sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
-        }
-    }
-
-    private boolean isMuted(String playerName) {
-        String player = getServer().getPlayer(playerName).getName();
+    public static boolean isMuted(String playerName) {
+        String player = Bukkit.getServer().getPlayer(playerName).getName();
         return mutees.contains(player);
+    }
+
+    private void registerCommands() {
+        getCommand("mute").setExecutor(new MuteCommand());
+        getCommand("unmute").setExecutor(new UnmuteCommand());
+        getCommand("ismuted").setExecutor(new IsMutedCommand());
+        getCommand("mutees").setExecutor(new MuteesCommand());
+
+        getCommand("snoop").setExecutor(new SnoopCommand(pm));
+        getCommand("pm").setExecutor(new PMCommand(pm));
+        getCommand("reply").setExecutor(new ReplyCommand(pm));
+        getCommand("me").setExecutor(new EmoteCommand());
+    }
+
+    private void saveMutees() {
+        File muteeFile = new File(getDataFolder(), "mutees.txt");
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(muteeFile));
+            out.writeObject(mutees);
+        } catch (Exception e) {
+            getServer().getLogger().severe("Could not write mutees to file");
+        }
+    }
+
+    private HashSet<String> loadMutees() {
+        File muteeFile = new File(getDataFolder(), "mutees.txt");
+        try {
+            ObjectInputStream in = new ObjectInputStream(new FileInputStream(muteeFile));
+            return (HashSet<String>) in.readObject();
+        } catch (Exception e) {
+            getServer().getLogger().severe("Could not read mutees from file");
+            return new HashSet<String>();
+        }
+
     }
 }

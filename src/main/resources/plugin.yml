@@ -5,46 +5,52 @@ description: A simple plugin for private messaging
 version: maven-version-number
 softdepend: [FuzzyLog]
 commands:
-  pm:
-    description: Private message a player
-    aliases: [tell,whisper,msg,w]
-    permission: fuzzymessenger.pm.send
-  r:
-    description: Reply to a message
-    aliases: [reply]
-    permission: fuzzymessenger.pm.send
-  mute:
-    description: Mutes a player
-    aliases: [stfu]
-    permission: fuzzymessenger.mute
-  unmute:
-    description: Unmutes a player
-    permission: fuzzymessenger.mute
-  ismuted:
-    description: Check if a player is muted
-  mutees:
-    description: Get a list of muted players
-  me:
-    description: IRC-like emote
-  snoop:
-    description: Turn snooping on or off
-    permission: fuzzymessenger.pm.snoop
+    pm:
+        description: Private message a player
+        aliases: [tell,whisper,msg,w]
+        permission: fuzzymessenger.pm.send
+        usage: /<command> [player] [message]
+    reply:
+        description: Reply to a message
+        aliases: [r]
+        permission: fuzzymessenger.pm.send
+        usage: /<command> [message]
+    mute:
+        description: Mutes a player
+        aliases: [stfu]
+        permission: fuzzymessenger.mute
+        usage: /<command> [player] - Mute a player
+    unmute:
+        description: Unmutes a player
+        permission: fuzzymessenger.mute
+        usage: /<command> [player] - Unmute a player
+    ismuted:
+        description: Check if a player is muted
+        usage: /<command> [player] - Check if a player is muted
+    mutees:
+        description: Get a list of muted players
+        usage: /<command> - Get a list of muted players
+    me:
+        description: IRC-like emote
+    snoop:
+        description: Turn snooping on or off
+        permission: fuzzymessenger.pm.snoop
 permissions:
-  fuzzymessenger.*:
-    description: All messaging related permissions
-    children:
-      fuzzymessenger.mute: true
-      fuzzymessenger.pm.*: true
-      fuzzymessenger.me: true
-      fuzzymessenger.filter.bypass: true
-  fuzzymessenger.pm.*:
-    description: All private message permissions
-    children:
-      fuzzymessenger.pm.send: true
-      fuzzymessenger.pm.snoop: true
-  fuzzymessenger.pm.send:
-    description: Allows a player to send a private message
-  fuzzymessenger.pm.snoop:
-    description: Allows a player to see others' private messages
-  fuzzymessenger.filter.bypass:
-    description: Bypass the word filtering
+    fuzzymessenger.*:
+        description: All messaging related permissions
+        children:
+            fuzzymessenger.mute: true
+            fuzzymessenger.pm.*: true
+            fuzzymessenger.me: true
+            fuzzymessenger.filter.bypass: true
+    fuzzymessenger.pm.*:
+        description: All private message permissions
+        children:
+            fuzzymessenger.pm.send: true
+            fuzzymessenger.pm.snoop: true
+    fuzzymessenger.pm.send:
+        description: Allows a player to send a private message
+    fuzzymessenger.pm.snoop:
+        description: Allows a player to see others' private messages
+    fuzzymessenger.filter.bypass:
+        description: Bypass the word filtering

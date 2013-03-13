@@ -36,49 +36,47 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 /**
- *
  * @author cedeel
  */
-public class FuzzyMessengerListener implements Listener {
+public final class FuzzyMessengerListener implements Listener {
 
-  private FuzzyMessenger plugin;
+    private FuzzyMessenger plugin;
 
-  public FuzzyMessengerListener(FuzzyMessenger plugin) {
-    this.plugin = plugin;
-  }
+    public FuzzyMessengerListener(FuzzyMessenger plugin) {
+        this.plugin = plugin;
+    }
 
-  @EventHandler(priority = EventPriority.LOWEST)
-  public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
-    if (plugin.mutees.contains(event.getPlayer().getName())) {
-      event.setCancelled(true);
-      event.getPlayer().sendMessage(ChatColor.DARK_GRAY + "Nobody hears you");
-    }
-    if (!event.getPlayer().hasPermission("fuzzymessenger.filter.bypass")) {
-      event.setMessage(plugin.filter.Filter(event.getMessage()));
-    }
-  }
-  
-  @EventHandler
-  public void onPlayerLogin(PlayerLoginEvent event) {
-    Player player = event.getPlayer();
-    if(player.hasPermission("fuzzymessenger.pm.snoop")) {
-      plugin.pm.addSnooper(player);
-    }
-  }
-  
-  @EventHandler
-  public void onPlayerQuit(PlayerQuitEvent event) {
-    Player player = event.getPlayer();
-    if(player.hasPermission("fuzzymessenger.pm.snoop")) {
-      try {
-        if(plugin.pm.isSnooper(player))
-        {
-          plugin.pm.removeSnooper(player);
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
+        if (FuzzyMessenger.getMutees().contains(event.getPlayer().getName())) {
+            event.setCancelled(true);
+            event.getPlayer().sendMessage(ChatColor.DARK_GRAY + "Nobody hears you");
         }
-      } catch(NullPointerException e) {
-        // This should not normally happen.
-        System.out.println("Player not found in snoopers table");
-      }
+        if (!event.getPlayer().hasPermission("fuzzymessenger.filter.bypass")) {
+            event.setMessage(plugin.filter.Filter(event.getMessage()));
+        }
     }
-  }
+
+    @EventHandler
+    public void onPlayerLogin(PlayerLoginEvent event) {
+        Player player = event.getPlayer();
+        if (player.hasPermission("fuzzymessenger.pm.snoop")) {
+            plugin.pm.addSnooper(player);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        if (player.hasPermission("fuzzymessenger.pm.snoop")) {
+            try {
+                if (plugin.pm.isSnooper(player)) {
+                    plugin.pm.removeSnooper(player);
+                }
+            } catch (NullPointerException e) {
+                // This should not normally happen.
+                System.out.println("Player not found in snoopers table");
+            }
+        }
+    }
 }

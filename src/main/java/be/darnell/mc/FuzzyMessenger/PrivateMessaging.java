@@ -29,173 +29,205 @@ package be.darnell.mc.FuzzyMessenger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 /**
- *
  * @author cedeel
  */
-public class PrivateMessaging {
+public final class PrivateMessaging {
 
-  private ChatColor introColor = ChatColor.DARK_GRAY;
-  private ChatColor snoopColor = ChatColor.DARK_GREEN;
-  private ChatColor msgColor = ChatColor.WHITE;
-  private ChatColor warnColor = ChatColor.RED;
-  private static FuzzyMessenger plugin;
-  private HashMap<String, String> pmers; // 2 names
-  private List<Player> snoopers;
+    private ChatColor introColor = ChatColor.DARK_GRAY;
+    private ChatColor snoopColor = ChatColor.DARK_GREEN;
+    private ChatColor msgColor = ChatColor.WHITE;
+    private ChatColor warnColor = ChatColor.RED;
+    private static FuzzyMessenger plugin;
+    private HashMap<String, String> pairs; // 2 names
+    private List<Player> snoopers;
 
-  public PrivateMessaging(FuzzyMessenger instance) {
-    plugin = instance;
-    pmers = new HashMap<String, String>();
-    snoopers = new ArrayList<Player>();
-  }
+    public PrivateMessaging(final FuzzyMessenger instance) {
+        plugin = instance;
+        pairs = new HashMap<String, String>();
+        snoopers = new ArrayList<Player>();
+    }
 
-  public boolean sendMessage(CommandSender sender, String recipient, String message) {
-    if (sender instanceof Player) {
-      Player player = (Player) sender;
+    public boolean sendMessage(CommandSender sender, String recipient, String message) {
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
 
-      if (!plugin.mutees.contains(player.getName()) && player.hasPermission("fuzzymessenger.pm.send")) {
-        String dest;
-        if (!recipient.equalsIgnoreCase("console")) {
-          // Player may be null, so we use a try-catch block
-          try {
-            Player receiver = plugin.getServer().getPlayer(recipient);
-            dest = receiver.getName();
-            fireMessage(message, player, receiver);
-          } catch (NullPointerException e) {
-            sender.sendMessage(warnColor + "Player " + recipient + " not found.");
-            return false;
-          }
+            if (!FuzzyMessenger.getMutees().contains(player.getName()) && player.hasPermission("fuzzymessenger.pm.send")) {
+                String destination;
+                if (!recipient.equalsIgnoreCase("console")) {
+                    // Player may be null, so we use a try-catch block
+                    try {
+                        Player receiver = plugin.getServer().getPlayer(recipient);
+                        destination = receiver.getName();
+                        fireMessage(message, player, receiver);
+                    } catch (NullPointerException e) {
+                        sender.sendMessage(warnColor + "Player " + recipient + " not found.");
+                        return false;
+                    }
 
-        } else { // If recipient is console
-          System.out.println("(From " + player.getName() + ") " + message);
-          sender.sendMessage(introColor + "(To CONSOLE) " + msgColor + message);
-          dest = "console";
+                } else { // If recipient is console
+                    System.out.println("(From " + player.getName() + ") " + message);
+                    sender.sendMessage(introColor + "(To CONSOLE) " + msgColor + message);
+                    logMessage(sender.getName(), "CONSOLE", message);
+                    destination = "console";
+                }
+                pairs.put(player.getName(), destination);
+                pairs.put(destination, player.getName());
+                return true;
+
+            } else {
+                player.sendMessage(warnColor + "You're not allowed to send private messages.");
+                return false;
+            }
+        } else if (sender instanceof ConsoleCommandSender) {
+            try {
+                Player receiver = plugin.getServer().getPlayer(recipient);
+                System.out.println("(To " + receiver.getName() + ") " + message);
+                receiver.sendMessage(introColor + "(From CONSOLE) " + msgColor + message);
+                logMessage("CONSOLE", receiver.getName(), message);
+                pairs.put(receiver.getName(), "console");
+                pairs.put("console", receiver.getName());
+                return true;
+            } catch (NullPointerException e) {
+                System.out.println("Recipient not found.");
+            }
         }
-        pmers.put(player.getName(), dest);
-        pmers.put(dest, player.getName());
-        return true;
-
-      } else {
-        player.sendMessage(warnColor + "You're not allowed to send private messages.");
         return false;
-      }
-    } else if (sender instanceof ConsoleCommandSender) {
-      try {
-        Player receiver = plugin.getServer().getPlayer(recipient);
-        System.out.println("(To " + receiver.getName() + ") " + message);
-        receiver.sendMessage(introColor + "(From CONSOLE) " + msgColor + message);
-        pmers.put(receiver.getName(), "console");
-        pmers.put("console", receiver.getName());
-        return true;
-      } catch (NullPointerException e) {
-        System.out.println("Recipient not found.");
-      }
     }
-    return false;
-  }
 
-  /**
-   * Reply to an incoming private message.
-   * @param sender The sender who is replying.
-   * @param message The message contents.
-   * @return Whether the operation was successful.
-   */
-  public boolean replyMessage(CommandSender sender, String message) {
-    if (sender instanceof Player) {
-      Player player = (Player) sender;
-      String recipient = null;
-      if (!plugin.mutees.contains(player.getName()) && player.hasPermission("fuzzymessenger.pm.send")) {
-        try {
-          recipient = pmers.get(player.getName()); // This is what might generate a NullPointerException.
-          if (recipient.equalsIgnoreCase("console")) {
-            System.out.println("(From " + player.getName() + ") " + message);
-            sender.sendMessage(introColor + "(To CONSOLE) " + msgColor + message);
-            return true;
-          }
-        } catch (NullPointerException e) {
-          sender.sendMessage(warnColor + "You cannot reply before sending or receiving a private message.");
-        }
-        try {
-          Player receiver = plugin.getServer().getPlayer(recipient); // This is another point where a NPE can be generated.
-          fireMessage(message, player, receiver);
-          return true;
-        } catch (NullPointerException e) {
-          sender.sendMessage(warnColor + "The player to whom you are replying could not be found.");
-          return false;
-        }
-      } else {
-        player.sendMessage(introColor + "You're not allowed to send private messages.");
+    /**
+     * Reply to an incoming private message.
+     *
+     * @param sender  The sender who is replying.
+     * @param message The message contents.
+     * @return Whether the operation was successful.
+     */
+    public boolean replyMessage(CommandSender sender, String message) {
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            String recipient = null;
+            if (!FuzzyMessenger.getMutees().contains(player.getName()) && player.hasPermission("fuzzymessenger.pm.send")) {
+                try {
+                    recipient = pairs.get(player.getName()); // This is what might generate a NullPointerException.
+                    if (recipient.equalsIgnoreCase("console")) {
+                        System.out.println("(From " + player.getName() + ") " + message);
+                        sender.sendMessage(introColor + "(To CONSOLE) " + msgColor + message);
+                        logMessage(player.getName(), "CONSOLE", message);
+                        return true;
+                    }
+                } catch (NullPointerException e) {
+                    sender.sendMessage(warnColor + "You cannot reply before sending or receiving a private message.");
+                }
+                try {
+                    Player receiver = plugin.getServer().getPlayer(recipient); // This is another point where a NPE can be generated.
+                    fireMessage(message, player, receiver);
+                    return true;
+                } catch (NullPointerException e) {
+                    sender.sendMessage(warnColor + "The player to whom you are replying could not be found.");
+                    return false;
+                }
+            } else {
+                player.sendMessage(introColor + "You're not allowed to send private messages.");
+                return false;
+            }
+        } // Sender is player
+        else if (sender instanceof ConsoleCommandSender) {
+            try {
+                Player receiver = plugin.getServer().getPlayer(pairs.get("console"));
+                System.out.println("(To " + receiver.getName() + ") " + message);
+                receiver.sendMessage(introColor + "(From CONSOLE) " + msgColor + message);
+                logMessage("CONSOLE", receiver.getName(), message);
+                pairs.put(receiver.getName(), "console");
+                pairs.put("console", receiver.getName());
+            } catch (NullPointerException e) {
+                System.out.println("Player not found.");
+            }
+        } // Sender is console
         return false;
-      }
-    } // Sender is player
-    else if (sender instanceof ConsoleCommandSender) {
-      try {
-        Player receiver = plugin.getServer().getPlayer(pmers.get("console"));
-        System.out.println("(To " + receiver.getName() + ") " + message);
-        receiver.sendMessage(introColor + "(From CONSOLE) " + msgColor + message);
-        pmers.put(receiver.getName(), "console");
-        pmers.put("console", receiver.getName());
-      } catch (NullPointerException e) {
-        System.out.println("Player not found.");
-      }
-    } // Sender is console
-    return false;
-  } // replyMessage()
+    } // replyMessage()
 
-  /**
-   * Add a player to the snooper list.
-   * @param p The player to be added.
-   */
-  protected void addSnooper(Player p) {
-    snoopers.add(p);
-  }
-
-  /**
-   * Know whether a player is in the snooper list.
-   * @param p The player in question.
-   * @return True if the player is snooping private messages.
-   */
-  protected boolean isSnooper(Player p) {
-    return snoopers.contains(p);
-  }
-
-  protected void removeSnooper(Player p) {
-    snoopers.remove(p);
-  }
-
-  /**
-   * Do the actual work of delivering a private message.
-   * @param message The message contents.
-   * @param sender The sender of the message.
-   * @param receiver  The receiver of the message.
-   */
-  private void fireMessage(String message, Player sender, Player receiver) {
-    sender.sendMessage(introColor + "(To " + receiver.getName() + ") " + msgColor + message);
-    receiver.sendMessage(introColor + "(From " + sender.getName() + ") " + msgColor + message);
-    
-    for (Player p : snoopers) {
-      if ((p != sender) && (p != receiver)) {
-        p.sendMessage(snoopColor + "(" + sender.getName() + " -> " + receiver.getName() + ") " + msgColor + message);
-      }
+    /**
+     * Add a player to the snooper list.
+     *
+     * @param p The player to be added.
+     */
+    public void addSnooper(Player p) {
+        snoopers.add(p);
     }
-    StringBuilder toLog = new StringBuilder(32);
-    toLog
-            .append("(")
-            .append(sender.getName())
-            .append(" -> ")
-            .append(receiver.getName())
-            .append(") ")
-            .append(message);
-    
-    if (plugin.useLogger) {
-      plugin.logger.log(toLog.toString());
-    } else {
-      plugin.getServer().getLogger().info(toLog.toString());
+
+    /**
+     * Know whether a player is in the snooper list.
+     *
+     * @param p The player in question.
+     * @return True if the player is snooping private messages.
+     */
+    public boolean isSnooper(Player p) {
+        return snoopers.contains(p);
     }
-  } //fireMessage()
+
+    /**
+     * Remove a player from snooping private messages.
+     *
+     * @param p The player to be removed.
+     */
+    public void removeSnooper(Player p) {
+        snoopers.remove(p);
+    }
+
+    /**
+     * Do the actual work of delivering a private message.
+     *
+     * @param message  The message contents.
+     * @param sender   The sender of the message.
+     * @param receiver The receiver of the message.
+     */
+    private void fireMessage(String message, Player sender, Player receiver) {
+        sender.sendMessage(introColor + "(To " + receiver.getName() + ") " + msgColor + message);
+        receiver.sendMessage(introColor + "(From " + sender.getName() + ") " + msgColor + message);
+
+        for (Player p : snoopers) {
+            if ((p != sender) && (p != receiver)) {
+                p.sendMessage(snoopColor + "(" + sender.getName() + " -> " + receiver.getName() + ") " + msgColor + message);
+            }
+        }
+
+        logMessage(sender.getName(), receiver.getName(), message);
+    } //fireMessage()
+
+    private void logMessage(String sender, String receiver, String message) {
+        StringBuilder toLog = new StringBuilder(32);
+        toLog
+                .append("(")
+                .append(sender)
+                .append(" -> ")
+                .append(receiver)
+                .append(") ")
+                .append(message);
+
+        if (plugin.useLogger) {
+            plugin.logger.log(toLog.toString());
+        } else {
+            plugin.getServer().getLogger().info(toLog.toString());
+        }
+    }
+
+    /**
+     * Construct a message string from an array of strings.
+     * @param message The array of strings to be concatenated.
+     * @param offset The first index in the array where the message appears.
+     * @return A string containing the message.
+     */
+    public static String constructMessage(String[] message, int offset) {
+        String m = "";
+        for (int i = offset; i < message.length; i++) {
+            m = m + " " + message[i];
+        }
+        return m.trim();
+    }
 } //PrivateMessaging
