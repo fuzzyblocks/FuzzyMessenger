@@ -50,6 +50,7 @@ public class MuteCommand implements CommandExecutor {
             try {
                 String mutee = Bukkit.getServer().getPlayer(player).getName();
                 FuzzyMessenger.addMutee(mutee);
+                FuzzyMessenger.logMessage(mutee + " was muted by " + sender.getName());
                 Bukkit.getServer().broadcastMessage(ChatColor.DARK_RED + mutee
                         + ChatColor.AQUA + " has been muted by "
                         + ChatColor.GOLD + sender.getName());

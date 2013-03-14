@@ -180,6 +180,10 @@ public final class PrivateMessaging {
         snoopers.remove(p);
     }
 
+    public List<Player> getSnoopers() {
+        return snoopers;
+    }
+
     /**
      * Do the actual work of delivering a private message.
      *
@@ -210,11 +214,7 @@ public final class PrivateMessaging {
                 .append(") ")
                 .append(message);
 
-        if (plugin.useLogger) {
-            plugin.logger.log(toLog.toString());
-        } else {
-            plugin.getServer().getLogger().info(toLog.toString());
-        }
+        FuzzyMessenger.logMessage(toLog.toString());
     }
 
     /**

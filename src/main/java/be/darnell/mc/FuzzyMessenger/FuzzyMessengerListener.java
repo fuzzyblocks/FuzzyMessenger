@@ -51,6 +51,9 @@ public final class FuzzyMessengerListener implements Listener {
         if (FuzzyMessenger.getMutees().contains(event.getPlayer().getName())) {
             event.setCancelled(true);
             event.getPlayer().sendMessage(ChatColor.DARK_GRAY + "Nobody hears you");
+            for(Player p : plugin.pm.getSnoopers()) {
+                p.sendMessage(ChatColor.LIGHT_PURPLE + event.getPlayer().getDisplayName() + ": " + event.getMessage());
+            }
         }
         if (!event.getPlayer().hasPermission("fuzzymessenger.filter.bypass")) {
             event.setMessage(plugin.filter.Filter(event.getMessage()));

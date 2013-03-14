@@ -51,8 +51,8 @@ public final class FuzzyMessenger extends JavaPlugin {
     private static HashSet<String> mutees = new HashSet<String>();
     protected WordFilter filter = new WordFilter(new File(getDataFolder(), "badwords.txt"), new File(getDataFolder(), "replacements.txt"));
     protected PrivateMessaging pm = new PrivateMessaging(this);
-    protected LogFacility logger;
-    protected boolean useLogger = false;
+    protected static LogFacility logger;
+    protected static boolean useLogger = false;
 
     @Override
     public void onEnable() {
@@ -78,6 +78,13 @@ public final class FuzzyMessenger extends JavaPlugin {
     public void onDisable() {
         saveConfig();
         saveMutees();
+    }
+
+    public static void logMessage(String message) {
+        if(useLogger)
+            logger.log(message);
+        else
+            Bukkit.getServer().getLogger().info(message);
     }
 
     public static boolean addMutee(String mutee) {
