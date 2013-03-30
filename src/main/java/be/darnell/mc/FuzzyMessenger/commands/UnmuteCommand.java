@@ -50,9 +50,9 @@ public class UnmuteCommand implements CommandExecutor {
             try {
                 if (FuzzyMessenger.removeMutee(player)) {
                     FuzzyMessenger.logMessage(player + " was unmuted by " + sender.getName());
-                    Bukkit.getServer().broadcastMessage(ChatColor.DARK_RED + player
-                            + ChatColor.AQUA + " has been unmuted by "
-                            + ChatColor.GOLD + sender.getName());
+                    Bukkit.getServer().broadcastMessage(ChatColor.GRAY + player
+                            + ChatColor.GOLD + " has been unmuted by "
+                            + ChatColor.GRAY + sender.getName());
                 } else {
                     sender.sendMessage(player + " was not muted.");
                 }

@@ -41,10 +41,10 @@ public class IsMutedCommand implements CommandExecutor {
         if (args.length == 1) {
             Player player = Bukkit.getServer().getPlayer(args[0]);
             if (FuzzyMessenger.isMuted(args[0])) {
-                sender.sendMessage(ChatColor.RED + player.getName()
+                sender.sendMessage(ChatColor.GRAY + player.getName()
                         + ChatColor.GOLD + " is muted.");
             } else {
-                sender.sendMessage(ChatColor.GREEN + player.getName()
+                sender.sendMessage(ChatColor.GRAY + player.getName()
                         + ChatColor.GOLD + " is not muted.");
             }
             return true;

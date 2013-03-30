@@ -39,7 +39,7 @@ public class MuteesCommand implements CommandExecutor {
         if (sender.hasPermission("fuzzymessenger.mute")) {
             sender.sendMessage(ChatColor.GOLD + "Muted players:");
             StringBuilder sb = new StringBuilder(48);
-            sb.append(ChatColor.DARK_RED);
+            sb.append(ChatColor.GRAY);
             try {
                 for (String p : FuzzyMessenger.getMutees()) {
                     sb.append(p).append(", ");
