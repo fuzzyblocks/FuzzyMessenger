@@ -72,7 +72,7 @@ public final class PrivateMessaging {
                     }
 
                 } else { // If recipient is console
-                    System.out.println("(From " + player.getName() + ") " + message);
+                    System.out.println("(From " + player.getDisplayName() + ") " + message);
                     sender.sendMessage(introColor + "(To CONSOLE) " + msgColor + message);
                     logMessage(sender.getName(), "CONSOLE", message);
                     destination = "console";
@@ -88,7 +88,7 @@ public final class PrivateMessaging {
         } else if (sender instanceof ConsoleCommandSender) {
             try {
                 Player receiver = plugin.getServer().getPlayer(recipient);
-                System.out.println("(To " + receiver.getName() + ") " + message);
+                System.out.println("(To " + receiver.getDisplayName() + ") " + message);
                 receiver.sendMessage(introColor + "(From CONSOLE) " + msgColor + message);
                 logMessage("CONSOLE", receiver.getName(), message);
                 pairs.put(receiver.getName(), "console");
@@ -116,7 +116,7 @@ public final class PrivateMessaging {
                 try {
                     recipient = pairs.get(player.getName()); // This is what might generate a NullPointerException.
                     if (recipient.equalsIgnoreCase("console")) {
-                        System.out.println("(From " + player.getName() + ") " + message);
+                        System.out.println("(From " + player.getDisplayName() + ") " + message);
                         sender.sendMessage(introColor + "(To CONSOLE) " + msgColor + message);
                         logMessage(player.getName(), "CONSOLE", message);
                         return true;
@@ -140,7 +140,7 @@ public final class PrivateMessaging {
         else if (sender instanceof ConsoleCommandSender) {
             try {
                 Player receiver = plugin.getServer().getPlayer(pairs.get("console"));
-                System.out.println("(To " + receiver.getName() + ") " + message);
+                System.out.println("(To " + receiver.getDisplayName() + ") " + message);
                 receiver.sendMessage(introColor + "(From CONSOLE) " + msgColor + message);
                 logMessage("CONSOLE", receiver.getName(), message);
                 pairs.put(receiver.getName(), "console");
@@ -192,17 +192,17 @@ public final class PrivateMessaging {
      * @param receiver The receiver of the message.
      */
     private void fireMessage(String message, Player sender, Player receiver) {
-        sender.sendMessage(introColor + "(To " + receiver.getName() + ") " + msgColor + message);
-        receiver.sendMessage(introColor + "(From " + sender.getName() + ") " + msgColor + message);
+        sender.sendMessage(introColor + "(To " + receiver.getDisplayName() + ") " + msgColor + message);
+        receiver.sendMessage(introColor + "(From " + sender.getDisplayName() + ") " + msgColor + message);
 
         for (Player p : snoopers) {
             if ((p != sender) && (p != receiver)) {
-                p.sendMessage(snoopColor + "(" + sender.getName() + " -> " + receiver.getName() + ") " + msgColor + message);
+                p.sendMessage(snoopColor + "(" + sender.getDisplayName() + " -> " + receiver.getDisplayName() + ") " + msgColor + message);
             }
         }
 
         logMessage(sender.getName(), receiver.getName(), message);
-    } //fireMessage()
+    }
 
     private void logMessage(String sender, String receiver, String message) {
         StringBuilder toLog = new StringBuilder(32);

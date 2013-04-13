@@ -32,6 +32,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class UnmuteCommand implements CommandExecutor {
 
@@ -45,22 +46,18 @@ public class UnmuteCommand implements CommandExecutor {
     }
 
     private boolean unmute(CommandSender sender, String player) {
-        if (sender.hasPermission("fuzzymessenger.mute")) {
-            // OfflinePlayer mutee = getServer().getOfflinePlayer(player);
-            try {
-                if (FuzzyMessenger.removeMutee(player)) {
-                    FuzzyMessenger.logMessage(player + " was unmuted by " + sender.getName());
-                    Bukkit.getServer().broadcastMessage(ChatColor.GRAY + player
-                            + ChatColor.GOLD + " has been unmuted by "
-                            + ChatColor.GRAY + sender.getName());
-                } else {
-                    sender.sendMessage(player + " was not muted.");
-                }
-            } catch (Exception e) {
-                sender.sendMessage(player + " not found or not muted.");
+        try {
+            if (FuzzyMessenger.removeMutee(player)) {
+                FuzzyMessenger.logMessage(player + " was unmuted by " + sender.getName());
+                String muter = sender instanceof Player ? ((Player) sender).getDisplayName() : sender.getName();
+                Bukkit.getServer().broadcastMessage(ChatColor.GRAY + player
+                        + ChatColor.GOLD + " has been unmuted by "
+                        + ChatColor.GRAY + muter);
+            } else {
+                sender.sendMessage(player + " was not muted.");
             }
-        } else {
-            sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
+        } catch (Exception e) {
+            sender.sendMessage(player + " not found or not muted.");
         }
         return true;
     }

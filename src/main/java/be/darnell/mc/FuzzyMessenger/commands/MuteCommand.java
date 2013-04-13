@@ -32,6 +32,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class MuteCommand implements CommandExecutor {
 
@@ -46,20 +47,17 @@ public class MuteCommand implements CommandExecutor {
     }
 
     private boolean mute(CommandSender sender, String player) {
-        if (sender.hasPermission("fuzzymessenger.mute")) {
-            try {
-                String mutee = Bukkit.getServer().getPlayer(player).getName();
-                FuzzyMessenger.addMutee(mutee);
-                FuzzyMessenger.logMessage(mutee + " was muted by " + sender.getName());
-                Bukkit.getServer().broadcastMessage(ChatColor.GRAY + mutee
-                        + ChatColor.GOLD + " has been muted by "
-                        + ChatColor.GRAY + sender.getName());
-            } catch (NullPointerException e) {
-                sender.sendMessage("Player not found.");
-                return false;
-            }
-        } else {
-            sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
+        try {
+            String mutee = Bukkit.getServer().getPlayer(player).getName();
+            String muter = sender instanceof Player ? ((Player) sender).getDisplayName() : sender.getName();
+            FuzzyMessenger.addMutee(mutee);
+            FuzzyMessenger.logMessage(mutee + " was muted by " + sender.getName());
+            Bukkit.getServer().broadcastMessage(ChatColor.GRAY + mutee
+                    + ChatColor.GOLD + " has been muted by "
+                    + ChatColor.GRAY + muter);
+        } catch (NullPointerException e) {
+            sender.sendMessage("Player not found.");
+            return false;
         }
         return true;
     }
