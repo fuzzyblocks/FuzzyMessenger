@@ -32,11 +32,12 @@ import be.darnell.mc.FuzzyLog.FuzzyLog;
 import be.darnell.mc.FuzzyLog.LogFacility;
 
 import java.io.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -48,7 +49,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class FuzzyMessenger extends JavaPlugin {
 
     private final FuzzyMessengerListener listener = new FuzzyMessengerListener(this);
-    private static HashSet<String> mutees = new HashSet<String>();
+    private static HashMap<String, Mutee> mutees = new HashMap<String, Mutee>();
     protected WordFilter filter = new WordFilter(new File(getDataFolder(), "badwords.txt"), new File(getDataFolder(), "replacements.txt"));
     protected PrivateMessaging pm = new PrivateMessaging(this);
     protected static LogFacility logger;
@@ -88,20 +89,24 @@ public final class FuzzyMessenger extends JavaPlugin {
     }
 
     public static boolean addMutee(String mutee) {
-        return mutees.add(mutee);
+        return mutees.put(mutee.toLowerCase(), new Mutee(Bukkit.getPlayer(mutee))) != null;
     }
 
     public static boolean removeMutee(String mutee) {
-        return mutees.remove(mutee);
+        return mutees.remove(mutee.toLowerCase()) != null;
     }
 
-    public static Set<String> getMutees() {
+    public static Map<String, Mutee> getMutees() {
         return mutees;
     }
 
-    public static boolean isMuted(String playerName) {
-        String player = Bukkit.getServer().getPlayer(playerName).getName();
-        return mutees.contains(player);
+    public static Mutee getMutee(String name) {
+        return mutees.get(name);
+    }
+
+    public static boolean isMuted(Player player) {
+        String test = player.getName().toLowerCase();
+        return mutees.containsKey(test);
     }
 
     private void registerCommands() {
@@ -126,14 +131,15 @@ public final class FuzzyMessenger extends JavaPlugin {
         }
     }
 
-    private HashSet<String> loadMutees() {
+    @SuppressWarnings("unchecked")
+    private HashMap<String, Mutee> loadMutees() {
         File muteeFile = new File(getDataFolder(), "mutees.txt");
         try {
             ObjectInputStream in = new ObjectInputStream(new FileInputStream(muteeFile));
-            return (HashSet<String>) in.readObject();
+            return (HashMap<String, Mutee>) in.readObject();
         } catch (Exception e) {
             getServer().getLogger().severe("Could not read mutees from file");
-            return new HashSet<String>();
+            return new HashMap<String, Mutee>();
         }
 
     }

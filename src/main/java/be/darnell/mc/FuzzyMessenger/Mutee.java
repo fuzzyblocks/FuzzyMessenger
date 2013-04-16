@@ -24,34 +24,16 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package be.darnell.mc.FuzzyMessenger.commands;
+package be.darnell.mc.FuzzyMessenger;
 
-import be.darnell.mc.FuzzyMessenger.FuzzyMessenger;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class IsMutedCommand implements CommandExecutor {
+public class Mutee {
+    public String playerName;
+    public String displayName;
 
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (args.length == 1) {
-            Player player = Bukkit.getServer().getPlayer(args[0]);
-            if (FuzzyMessenger.isMuted(player)) {
-                sender.sendMessage(ChatColor.GRAY + player.getDisplayName()
-                        + ChatColor.GOLD + " is muted.");
-            } else {
-                sender.sendMessage(ChatColor.GRAY + player.getDisplayName()
-                        + ChatColor.GOLD + " is not muted.");
-            }
-            return true;
-        } else {
-            sender.sendMessage(ChatColor.GOLD
-                    + "Usage: /ismuted <player>");
-            return false;
-        }
+    public Mutee(Player p) {
+        playerName = p.getName();
+        displayName = p.getDisplayName();
     }
 }

@@ -27,6 +27,7 @@
 package be.darnell.mc.FuzzyMessenger.commands;
 
 import be.darnell.mc.FuzzyMessenger.FuzzyMessenger;
+import be.darnell.mc.FuzzyMessenger.Mutee;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -47,10 +48,11 @@ public class UnmuteCommand implements CommandExecutor {
 
     private boolean unmute(CommandSender sender, String player) {
         try {
+            Mutee m = FuzzyMessenger.getMutee(player);
             if (FuzzyMessenger.removeMutee(player)) {
                 FuzzyMessenger.logMessage(player + " was unmuted by " + sender.getName());
                 String muter = sender instanceof Player ? ((Player) sender).getDisplayName() : sender.getName();
-                Bukkit.getServer().broadcastMessage(ChatColor.GRAY + player
+                Bukkit.getServer().broadcastMessage(ChatColor.GRAY + m.displayName
                         + ChatColor.GOLD + " has been unmuted by "
                         + ChatColor.GRAY + muter);
             } else {
