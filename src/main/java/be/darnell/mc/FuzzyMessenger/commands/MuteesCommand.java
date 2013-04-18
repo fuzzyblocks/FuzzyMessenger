@@ -26,7 +26,7 @@
  */
 package be.darnell.mc.FuzzyMessenger.commands;
 
-import be.darnell.mc.FuzzyMessenger.FuzzyMessenger;
+import be.darnell.mc.FuzzyMessenger.MuteManager;
 import be.darnell.mc.FuzzyMessenger.Mutee;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -35,6 +35,12 @@ import org.bukkit.command.CommandSender;
 
 public class MuteesCommand implements CommandExecutor {
 
+    private MuteManager manager;
+
+    public MuteesCommand(MuteManager mm) {
+        manager = mm;
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String alias, String[] args) {
         if (sender.hasPermission("fuzzymessenger.mute")) {
@@ -42,7 +48,7 @@ public class MuteesCommand implements CommandExecutor {
             StringBuilder sb = new StringBuilder(48);
             sb.append(ChatColor.GRAY);
             try {
-                for (Mutee mutee : FuzzyMessenger.getMutees().values()) {
+                for (Mutee mutee : manager.getAll().values()) {
                     sb.append(mutee.playerName).append(", ");
                 }
             } catch (NullPointerException ignored) {

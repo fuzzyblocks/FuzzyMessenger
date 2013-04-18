@@ -26,7 +26,7 @@
  */
 package be.darnell.mc.FuzzyMessenger.commands;
 
-import be.darnell.mc.FuzzyMessenger.FuzzyMessenger;
+import be.darnell.mc.FuzzyMessenger.MuteManager;
 import be.darnell.mc.FuzzyMessenger.PrivateMessaging;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -36,6 +36,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class EmoteCommand implements CommandExecutor {
+
+    private MuteManager manager;
+
+    public EmoteCommand(MuteManager mm) {
+        manager = mm;
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String alias, String... args) {
         emote(sender, PrivateMessaging.constructMessage(args, 0));
@@ -46,7 +53,7 @@ public class EmoteCommand implements CommandExecutor {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             if (player.hasPermission("fuzzymessenger.me")) {
-                if (FuzzyMessenger.getMutees().containsKey(player.getName())) {
+                if (manager.getAll().containsKey(player.getName())) {
                     player.sendMessage(ChatColor.RED + "You can't use emotes while muted.");
                 } else {
                     Bukkit.getServer().broadcastMessage(ChatColor.DARK_GRAY + "* "

@@ -27,6 +27,7 @@
 package be.darnell.mc.FuzzyMessenger.commands;
 
 import be.darnell.mc.FuzzyMessenger.FuzzyMessenger;
+import be.darnell.mc.FuzzyMessenger.MuteManager;
 import be.darnell.mc.FuzzyMessenger.Mutee;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -37,29 +38,37 @@ import org.bukkit.entity.Player;
 
 public class UnmuteCommand implements CommandExecutor {
 
+    private MuteManager manager;
+
+    public UnmuteCommand(MuteManager mm) {
+        manager = mm;
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (args.length == 1) {
-            return unmute(sender, args[0]);
+            Mutee mutee = manager.get(args[0]);
+            if(mutee != null) {
+                return unmute(sender, mutee);
+            }
         }
         sender.sendMessage(ChatColor.GOLD + "Usage: /unmute <player>");
         return false;
     }
 
-    private boolean unmute(CommandSender sender, String player) {
+    private boolean unmute(CommandSender sender, Mutee mutee) {
         try {
-            Mutee m = FuzzyMessenger.getMutee(player);
-            if (FuzzyMessenger.removeMutee(player)) {
-                FuzzyMessenger.logMessage(player + " was unmuted by " + sender.getName());
+            if (manager.remove(mutee.playerName)) {
+                FuzzyMessenger.logMessage(mutee.playerName + " was unmuted by " + sender.getName());
                 String muter = sender instanceof Player ? ((Player) sender).getDisplayName() : sender.getName();
-                Bukkit.getServer().broadcastMessage(ChatColor.GRAY + m.displayName
+                Bukkit.getServer().broadcastMessage(ChatColor.GRAY + mutee.displayName
                         + ChatColor.GOLD + " has been unmuted by "
                         + ChatColor.GRAY + muter);
             } else {
-                sender.sendMessage(player + " was not muted.");
+                sender.sendMessage(mutee.displayName + " was not muted.");
             }
         } catch (Exception e) {
-            sender.sendMessage(player + " not found or not muted.");
+            sender.sendMessage(mutee.displayName + " not found or not muted.");
         }
         return true;
     }

@@ -26,7 +26,7 @@
  */
 package be.darnell.mc.FuzzyMessenger.commands;
 
-import be.darnell.mc.FuzzyMessenger.FuzzyMessenger;
+import be.darnell.mc.FuzzyMessenger.MuteManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -36,11 +36,17 @@ import org.bukkit.entity.Player;
 
 public class IsMutedCommand implements CommandExecutor {
 
+    private MuteManager manager;
+
+    public IsMutedCommand(MuteManager mm) {
+        manager = mm;
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 1) {
             Player player = Bukkit.getServer().getPlayer(args[0]);
-            if (FuzzyMessenger.isMuted(player)) {
+            if (manager.isMuted(player)) {
                 sender.sendMessage(ChatColor.GRAY + player.getDisplayName()
                         + ChatColor.GOLD + " is muted.");
             } else {

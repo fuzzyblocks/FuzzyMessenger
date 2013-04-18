@@ -32,12 +32,9 @@ import be.darnell.mc.FuzzyLog.FuzzyLog;
 import be.darnell.mc.FuzzyLog.LogFacility;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -49,7 +46,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class FuzzyMessenger extends JavaPlugin {
 
     private final FuzzyMessengerListener listener = new FuzzyMessengerListener(this);
-    private static HashMap<String, Mutee> mutees = new HashMap<String, Mutee>();
+
+    // Map of mutees. String is username in lowercase.
+    public MuteManager mm = new MuteManager(getDataFolder());
     protected WordFilter filter = new WordFilter(new File(getDataFolder(), "badwords.txt"), new File(getDataFolder(), "replacements.txt"));
     protected PrivateMessaging pm = new PrivateMessaging(this);
     protected static LogFacility logger;
@@ -70,15 +69,13 @@ public final class FuzzyMessenger extends JavaPlugin {
                 useLogger = false;
             }
         }
-
-        mutees = loadMutees();
         registerCommands();
     }
 
     @Override
     public void onDisable() {
         saveConfig();
-        saveMutees();
+        mm.save();
     }
 
     public static void logMessage(String message) {
@@ -88,59 +85,15 @@ public final class FuzzyMessenger extends JavaPlugin {
             Bukkit.getServer().getLogger().info(message);
     }
 
-    public static boolean addMutee(String mutee) {
-        return mutees.put(mutee.toLowerCase(), new Mutee(Bukkit.getPlayer(mutee))) != null;
-    }
-
-    public static boolean removeMutee(String mutee) {
-        return mutees.remove(mutee.toLowerCase()) != null;
-    }
-
-    public static Map<String, Mutee> getMutees() {
-        return mutees;
-    }
-
-    public static Mutee getMutee(String name) {
-        return mutees.get(name);
-    }
-
-    public static boolean isMuted(Player player) {
-        String test = player.getName().toLowerCase();
-        return mutees.containsKey(test);
-    }
-
     private void registerCommands() {
-        getCommand("mute").setExecutor(new MuteCommand());
-        getCommand("unmute").setExecutor(new UnmuteCommand());
-        getCommand("ismuted").setExecutor(new IsMutedCommand());
-        getCommand("mutees").setExecutor(new MuteesCommand());
+        getCommand("mute").setExecutor(new MuteCommand(mm));
+        getCommand("unmute").setExecutor(new UnmuteCommand(mm));
+        getCommand("ismuted").setExecutor(new IsMutedCommand(mm));
+        getCommand("mutees").setExecutor(new MuteesCommand(mm));
 
         getCommand("snoop").setExecutor(new SnoopCommand(pm));
         getCommand("pm").setExecutor(new PMCommand(pm));
         getCommand("reply").setExecutor(new ReplyCommand(pm));
-        getCommand("me").setExecutor(new EmoteCommand());
-    }
-
-    private void saveMutees() {
-        File muteeFile = new File(getDataFolder(), "mutees.txt");
-        try {
-            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(muteeFile));
-            out.writeObject(mutees);
-        } catch (Exception e) {
-            getServer().getLogger().severe("Could not write mutees to file");
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private HashMap<String, Mutee> loadMutees() {
-        File muteeFile = new File(getDataFolder(), "mutees.txt");
-        try {
-            ObjectInputStream in = new ObjectInputStream(new FileInputStream(muteeFile));
-            return (HashMap<String, Mutee>) in.readObject();
-        } catch (Exception e) {
-            getServer().getLogger().severe("Could not read mutees from file");
-            return new HashMap<String, Mutee>();
-        }
-
+        getCommand("me").setExecutor(new EmoteCommand(mm));
     }
 }

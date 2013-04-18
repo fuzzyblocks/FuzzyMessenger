@@ -58,7 +58,7 @@ public final class PrivateMessaging {
         if (sender instanceof Player) {
             Player player = (Player) sender;
 
-            if (!FuzzyMessenger.getMutees().containsKey(player.getName()) && player.hasPermission("fuzzymessenger.pm.send")) {
+            if (!plugin.mm.isMuted(player) && player.hasPermission("fuzzymessenger.pm.send")) {
                 String destination;
                 if (!recipient.equalsIgnoreCase("console")) {
                     // Player may be null, so we use a try-catch block
@@ -112,7 +112,7 @@ public final class PrivateMessaging {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             String recipient = null;
-            if (!FuzzyMessenger.getMutees().containsKey(player.getName()) && player.hasPermission("fuzzymessenger.pm.send")) {
+            if (!plugin.mm.isMuted(player) && player.hasPermission("fuzzymessenger.pm.send")) {
                 try {
                     recipient = pairs.get(player.getName()); // This is what might generate a NullPointerException.
                     if (recipient.equalsIgnoreCase("console")) {

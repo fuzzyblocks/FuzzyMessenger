@@ -27,6 +27,7 @@
 package be.darnell.mc.FuzzyMessenger.commands;
 
 import be.darnell.mc.FuzzyMessenger.FuzzyMessenger;
+import be.darnell.mc.FuzzyMessenger.MuteManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -35,6 +36,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class MuteCommand implements CommandExecutor {
+
+    private MuteManager manager;
+
+    public MuteCommand(MuteManager mm) {
+        manager = mm;
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String alias, String[] args) {
@@ -50,7 +57,7 @@ public class MuteCommand implements CommandExecutor {
         try {
             Player mutee = Bukkit.getServer().getPlayer(player);
             String muter = sender instanceof Player ? ((Player) sender).getDisplayName() : sender.getName();
-            FuzzyMessenger.addMutee(mutee.getName());
+            manager.add(mutee.getName());
             FuzzyMessenger.logMessage(mutee + " was muted by " + sender.getName());
             Bukkit.getServer().broadcastMessage(ChatColor.GRAY + mutee.getDisplayName()
                     + ChatColor.GOLD + " has been muted by "

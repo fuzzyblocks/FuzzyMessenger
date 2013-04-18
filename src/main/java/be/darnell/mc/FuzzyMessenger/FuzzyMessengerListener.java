@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 cedeel.
+ * Copyright (c) 2012 - 2013 cedeel.
  * All rights reserved.
  * 
  *
@@ -48,11 +48,11 @@ public final class FuzzyMessengerListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
-        if (FuzzyMessenger.getMutees().contains(event.getPlayer().getName())) {
+        if (plugin.mm.isMuted(event.getPlayer())) {
             event.setCancelled(true);
             event.getPlayer().sendMessage(ChatColor.DARK_GRAY + "Nobody hears you");
             for(Player p : plugin.pm.getSnoopers()) {
-                p.sendMessage(ChatColor.LIGHT_PURPLE + event.getPlayer().getDisplayName() + ": " + event.getMessage());
+                p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + event.getPlayer().getDisplayName() + ChatColor.GRAY + ": " + event.getMessage());
             }
         }
         if (!event.getPlayer().hasPermission("fuzzymessenger.filter.bypass")) {
