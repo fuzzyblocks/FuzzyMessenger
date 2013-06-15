@@ -123,6 +123,7 @@ public final class PrivateMessaging {
                     }
                 } catch (NullPointerException e) {
                     sender.sendMessage(warnColor + "You cannot reply before sending or receiving a private message.");
+                    return false;
                 }
                 try {
                     Player receiver = plugin.getServer().getPlayer(recipient); // This is another point where a NPE can be generated.
