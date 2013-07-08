@@ -42,7 +42,7 @@ public final class PrivateMessaging {
 
     private ChatColor introColor = ChatColor.DARK_GRAY;
     private ChatColor snoopColor = ChatColor.DARK_GREEN;
-    private ChatColor msgColor = ChatColor.WHITE;
+    private ChatColor msgColor = ChatColor.ITALIC;
     private ChatColor warnColor = ChatColor.RED;
     private static FuzzyMessenger plugin;
     private HashMap<String, String> pairs; // 2 names
@@ -72,8 +72,8 @@ public final class PrivateMessaging {
                     }
 
                 } else { // If recipient is console
-                    System.out.println("(From " + player.getDisplayName() + ") " + message);
-                    sender.sendMessage(introColor + "(To CONSOLE) " + msgColor + message);
+                    System.out.println("«" + player.getDisplayName() + ": " + message);
+                    sender.sendMessage(introColor + "»CONSOLE: " + msgColor + message);
                     logMessage(sender.getName(), "CONSOLE", message);
                     destination = "console";
                 }
@@ -88,8 +88,8 @@ public final class PrivateMessaging {
         } else if (sender instanceof ConsoleCommandSender) {
             try {
                 Player receiver = plugin.getServer().getPlayer(recipient);
-                System.out.println("(To " + receiver.getDisplayName() + ") " + message);
-                receiver.sendMessage(introColor + "(From CONSOLE) " + msgColor + message);
+                System.out.println("»" + receiver.getDisplayName() + ") " + message);
+                receiver.sendMessage(introColor + "«CONSOLE: " + msgColor + message);
                 logMessage("CONSOLE", receiver.getName(), message);
                 pairs.put(receiver.getName(), "console");
                 pairs.put("console", receiver.getName());
@@ -111,13 +111,13 @@ public final class PrivateMessaging {
     public boolean replyMessage(CommandSender sender, String message) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            String recipient = null;
+            String recipient;
             if (!plugin.mm.isMuted(player) && player.hasPermission("fuzzymessenger.pm.send")) {
                 try {
                     recipient = pairs.get(player.getName()); // This is what might generate a NullPointerException.
                     if (recipient.equalsIgnoreCase("console")) {
-                        System.out.println("(From " + player.getDisplayName() + ") " + message);
-                        sender.sendMessage(introColor + "(To CONSOLE) " + msgColor + message);
+                        System.out.println("«" + player.getDisplayName() + ") " + message);
+                        sender.sendMessage(introColor + "»CONSOLE: " + msgColor + message);
                         logMessage(player.getName(), "CONSOLE", message);
                         return true;
                     }
@@ -141,8 +141,8 @@ public final class PrivateMessaging {
         else if (sender instanceof ConsoleCommandSender) {
             try {
                 Player receiver = plugin.getServer().getPlayer(pairs.get("console"));
-                System.out.println("(To " + receiver.getDisplayName() + ") " + message);
-                receiver.sendMessage(introColor + "(From CONSOLE) " + msgColor + message);
+                System.out.println("»" + receiver.getDisplayName() + ") " + message);
+                receiver.sendMessage(introColor + "«CONSOLE: " + msgColor + message);
                 logMessage("CONSOLE", receiver.getName(), message);
                 pairs.put(receiver.getName(), "console");
                 pairs.put("console", receiver.getName());
@@ -193,12 +193,12 @@ public final class PrivateMessaging {
      * @param receiver The receiver of the message.
      */
     private void fireMessage(String message, Player sender, Player receiver) {
-        sender.sendMessage(introColor + "(To " + receiver.getDisplayName() + ") " + msgColor + message);
-        receiver.sendMessage(introColor + "(From " + sender.getDisplayName() + ") " + msgColor + message);
+        sender.sendMessage(introColor + "»" + receiver.getDisplayName() + ") " + msgColor + message);
+        receiver.sendMessage(introColor + "«" + sender.getDisplayName() + ") " + msgColor + message);
 
         for (Player p : snoopers) {
             if ((p != sender) && (p != receiver)) {
-                p.sendMessage(snoopColor + "(" + sender.getDisplayName() + " -> " + receiver.getDisplayName() + ") " + msgColor + message);
+                p.sendMessage(snoopColor + sender.getDisplayName() + "»" + receiver.getDisplayName() + msgColor + message);
             }
         }
 
@@ -208,11 +208,10 @@ public final class PrivateMessaging {
     private void logMessage(String sender, String receiver, String message) {
         StringBuilder toLog = new StringBuilder(32);
         toLog
-                .append("(")
                 .append(sender)
-                .append(" -> ")
+                .append(" » ")
                 .append(receiver)
-                .append(") ")
+                .append(": ")
                 .append(message);
 
         FuzzyMessenger.logMessage(toLog.toString());
