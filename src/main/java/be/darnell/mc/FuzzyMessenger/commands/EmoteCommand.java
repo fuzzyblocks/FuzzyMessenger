@@ -53,7 +53,7 @@ public class EmoteCommand implements CommandExecutor {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             if (player.hasPermission("fuzzymessenger.me")) {
-                if (manager.getAll().containsKey(player.getName())) {
+                if (manager.isMuted(player)) {
                     player.sendMessage(ChatColor.RED + "You can't use emotes while muted.");
                 } else {
                     Bukkit.getServer().broadcastMessage(ChatColor.DARK_GRAY + "* "
