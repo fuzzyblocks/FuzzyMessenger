@@ -26,6 +26,7 @@
  */
 package be.darnell.mc.FuzzyMessenger;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -51,13 +52,11 @@ public final class FuzzyMessengerListener implements Listener {
         if (plugin.mm.isMuted(event.getPlayer())) {
             event.setCancelled(true);
             event.getPlayer().sendMessage(ChatColor.DARK_GRAY + "Nobody hears you");
-            for(Player p : plugin.pm.getSnoopers()) {
-                p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + event.getPlayer().getDisplayName() + ChatColor.GRAY + ": " + event.getMessage());
-            }
+            for(String snooper : plugin.pm.getSnoopers())
+                Bukkit.getPlayer(snooper).sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + event.getPlayer().getDisplayName() + ChatColor.GRAY + ": " + event.getMessage());
         }
-        if (!event.getPlayer().hasPermission("fuzzymessenger.filter.bypass")) {
+        if (!event.getPlayer().hasPermission("fuzzymessenger.filter.bypass"))
             event.setMessage(plugin.filter.Filter(event.getMessage()));
-        }
     }
 
     @EventHandler
@@ -73,9 +72,8 @@ public final class FuzzyMessengerListener implements Listener {
         Player player = event.getPlayer();
         if (player.hasPermission("fuzzymessenger.pm.snoop")) {
             try {
-                if (plugin.pm.isSnooper(player)) {
+                if (plugin.pm.isSnooper(player))
                     plugin.pm.removeSnooper(player);
-                }
             } catch (NullPointerException e) {
                 // This should not normally happen.
                 System.out.println("Player not found in snoopers table");

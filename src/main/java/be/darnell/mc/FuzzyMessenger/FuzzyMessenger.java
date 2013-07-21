@@ -47,7 +47,6 @@ public final class FuzzyMessenger extends JavaPlugin {
 
     private final FuzzyMessengerListener listener = new FuzzyMessengerListener(this);
 
-    // Map of mutees. String is username in lowercase.
     public MuteManager mm = new MuteManager(getDataFolder());
     protected WordFilter filter = new WordFilter(new File(getDataFolder(), "badwords.txt"), new File(getDataFolder(), "replacements.txt"));
     protected PrivateMessaging pm = new PrivateMessaging(this);

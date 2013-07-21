@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -46,12 +47,12 @@ public final class PrivateMessaging {
     private ChatColor warnColor = ChatColor.RED;
     private static FuzzyMessenger plugin;
     private HashMap<String, String> pairs; // 2 names
-    private List<Player> snoopers;
+    private List<String> snoopers;
 
     public PrivateMessaging(final FuzzyMessenger instance) {
         plugin = instance;
         pairs = new HashMap<String, String>();
-        snoopers = new ArrayList<Player>();
+        snoopers = new ArrayList<String>();
     }
 
     public boolean sendMessage(CommandSender sender, String recipient, String message) {
@@ -159,7 +160,7 @@ public final class PrivateMessaging {
      * @param p The player to be added.
      */
     public void addSnooper(Player p) {
-        snoopers.add(p);
+        snoopers.add(p.getName().toLowerCase());
     }
 
     /**
@@ -169,7 +170,7 @@ public final class PrivateMessaging {
      * @return True if the player is snooping private messages.
      */
     public boolean isSnooper(Player p) {
-        return snoopers.contains(p);
+        return snoopers.contains(p.getName().toLowerCase());
     }
 
     /**
@@ -178,10 +179,10 @@ public final class PrivateMessaging {
      * @param p The player to be removed.
      */
     public void removeSnooper(Player p) {
-        snoopers.remove(p);
+        snoopers.remove(p.getName().toLowerCase());
     }
 
-    public List<Player> getSnoopers() {
+    public List<String> getSnoopers() {
         return snoopers;
     }
 
@@ -196,7 +197,8 @@ public final class PrivateMessaging {
         sender.sendMessage(introColor + "»" + receiver.getDisplayName() + ": " + msgColor + message);
         receiver.sendMessage(introColor + "«" + sender.getDisplayName() + ": " + msgColor + message);
 
-        for (Player p : snoopers) {
+        for (String snooper : snoopers) {
+            Player p = Bukkit.getPlayer(snooper);
             if ((p != sender) && (p != receiver)) {
                 p.sendMessage(snoopColor + sender.getDisplayName() + "» " + receiver.getDisplayName() + msgColor + message);
             }
@@ -225,9 +227,8 @@ public final class PrivateMessaging {
      */
     public static String constructMessage(String[] message, int offset) {
         String m = "";
-        for (int i = offset; i < message.length; i++) {
+        for (int i = offset; i < message.length; i++)
             m = m + " " + message[i];
-        }
         return m.trim();
     }
 } //PrivateMessaging
