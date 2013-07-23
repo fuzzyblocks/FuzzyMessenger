@@ -1,8 +1,8 @@
-name: FuzzyMessenger
+name: ${name}
 main: be.darnell.mc.FuzzyMessenger.FuzzyMessenger
 author: cedeel
 description: A simple plugin for private messaging
-version: maven-version-number
+version: ${version}
 softdepend: [FuzzyLog]
 commands:
     pm:
