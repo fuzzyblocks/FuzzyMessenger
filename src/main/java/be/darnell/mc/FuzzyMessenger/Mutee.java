@@ -36,4 +36,9 @@ public class Mutee {
         playerName = p.getName();
         displayName = p.getDisplayName();
     }
+
+    @Override
+    public String toString() {
+        return playerName;
+    }
 }

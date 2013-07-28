@@ -28,6 +28,7 @@ package be.darnell.mc.FuzzyMessenger.commands;
 
 import be.darnell.mc.FuzzyMessenger.FuzzyMessenger;
 import be.darnell.mc.FuzzyMessenger.MuteManager;
+import be.darnell.mc.FuzzyMessenger.Mutee;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -55,13 +56,16 @@ public class MuteCommand implements CommandExecutor {
 
     private boolean mute(CommandSender sender, String player) {
         try {
-            Player mutee = Bukkit.getServer().getPlayer(player);
+            Mutee mutee = new Mutee(Bukkit.getServer().getPlayer(player));
             String muter = sender instanceof Player ? ((Player) sender).getDisplayName() : sender.getName();
-            manager.add(mutee.getName());
-            FuzzyMessenger.logMessage(mutee + " was muted by " + sender.getName());
-            Bukkit.getServer().broadcastMessage(ChatColor.GRAY + mutee.getDisplayName()
-                    + ChatColor.GOLD + " has been muted by "
-                    + ChatColor.GRAY + muter);
+            if (manager.add(mutee.playerName)) {
+                FuzzyMessenger.logMessage(mutee + " was muted by " + sender.getName());
+                Bukkit.getServer().broadcastMessage(ChatColor.GRAY + mutee.displayName
+                        + ChatColor.GOLD + " has been muted by "
+                        + ChatColor.GRAY + muter);
+            } else {
+                sender.sendMessage(ChatColor.GRAY + mutee.displayName + ChatColor.GOLD + " is already muted.");
+            }
         } catch (NullPointerException e) {
             sender.sendMessage("Player not found.");
             return false;
