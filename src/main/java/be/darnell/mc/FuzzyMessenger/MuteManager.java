@@ -57,7 +57,7 @@ public class MuteManager {
     }
 
     public boolean add(String mutee) {
-        return mutees.put(mutee.toLowerCase(), new Mutee(Bukkit.getPlayer(mutee))) != null;
+        return mutees.put(mutee.toLowerCase(), new Mutee(Bukkit.getPlayer(mutee))) == null;
     }
 
     public boolean remove(String mutee) {
