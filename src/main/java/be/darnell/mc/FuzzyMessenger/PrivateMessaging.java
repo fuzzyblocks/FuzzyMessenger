@@ -200,7 +200,7 @@ public final class PrivateMessaging {
         for (String snooper : snoopers) {
             Player p = Bukkit.getPlayer(snooper);
             if ((p != sender) && (p != receiver)) {
-                p.sendMessage(snoopColor + sender.getDisplayName() + "» " + receiver.getDisplayName() + msgColor + message);
+                p.sendMessage(snoopColor + sender.getDisplayName() + "»" + receiver.getDisplayName() + ": " + msgColor + message);
             }
         }
 
