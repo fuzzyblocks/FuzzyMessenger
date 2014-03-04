@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 - 2013 cedeel.
+ * Copyright (c) 2012 - 2014 Chris Darnell (cedeel).
  * All rights reserved.
  * 
  *
