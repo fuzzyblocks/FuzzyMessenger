@@ -26,15 +26,15 @@
  */
 package be.darnell.mc.FuzzyMessenger;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author cedeel
@@ -55,6 +55,14 @@ public final class PrivateMessaging {
         snoopers = new ArrayList<String>();
     }
 
+    /**
+     * Send a private message.
+     *
+     * @param sender    The sender of the message.
+     * @param recipient The recipient of the message.
+     * @param message   The message contents.
+     * @return Whether the message was successfully sent.
+     */
     public boolean sendMessage(CommandSender sender, String recipient, String message) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
@@ -68,7 +76,7 @@ public final class PrivateMessaging {
                         destination = receiver.getName();
                         fireMessage(message, player, receiver);
                     } catch (NullPointerException e) {
-                        sender.sendMessage(warnColor + "Player " + recipient + " not found.");
+                        sender.sendMessage(warnColor + "Player " + recipient + " not found. Did you spell it correctly?");
                         return false;
                     }
 
@@ -221,8 +229,9 @@ public final class PrivateMessaging {
 
     /**
      * Construct a message string from an array of strings.
+     *
      * @param message The array of strings to be concatenated.
-     * @param offset The first index in the array where the message appears.
+     * @param offset  The first index in the array where the message appears.
      * @return A string containing the message.
      */
     public static String constructMessage(String[] message, int offset) {

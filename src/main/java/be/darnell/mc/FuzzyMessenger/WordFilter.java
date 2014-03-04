@@ -28,43 +28,49 @@ package be.darnell.mc.FuzzyMessenger;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
+
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * @author cedeel
  */
 public class WordFilter {
 
-  private List<String> badWords = new ArrayList<String>();
-  private HashMap<String, String> badVerbs;
-  protected static final Logger log = Logger.getLogger("Minecraft");
+    private Set<String> badWords;
+    private List<String> replacementWords;
+    private Random rand;
+    protected static final Logger log = Logger.getLogger("Minecraft");
 
-  public WordFilter(File badWordFile, File replacementFile) {
-    try {
-      badWords = Files.readLines(badWordFile, Charsets.UTF_8);
-    } catch (IOException ex) {
-      log.log(Level.WARNING, "badwords.txt not found.");
-    }
-    
-    try {
-      List<String> gWords = Files.readLines(replacementFile, Charsets.UTF_8);
-    } catch (IOException e) {
-      log.log(Level.WARNING, "replacements.txt not found.");
-    }
-  }
+    public WordFilter(File badWordFile, File replacementFile) {
+        try {
+            badWords = new HashSet<String>(Files.readLines(badWordFile, Charsets.UTF_8));
+        } catch (IOException ex) {
+            log.log(Level.WARNING, "badwords.txt not found.");
+        }
 
-  public String Filter(String input) {
-    String out = input;
-    for (String word : badWords) {
-      out = out.replaceAll(word, "removed");
+        try {
+            replacementWords = Files.readLines(replacementFile, Charsets.UTF_8);
+        } catch (IOException e) {
+            log.log(Level.WARNING, "replacements.txt not found.");
+        }
+
+        rand = new Random();
     }
-    return out;
-  }
+
+    public String filter(String input) {
+        String out = input;
+        for (String word : badWords) {
+            String replaced = replacementWords.get(rand.nextInt(replacementWords.size()));
+            out = out.replaceAll(word, replaced);
+        }
+        return out;
+    }
+
+    public boolean isBadWord(String input) {
+        return badWords.contains(input);
+    }
 }

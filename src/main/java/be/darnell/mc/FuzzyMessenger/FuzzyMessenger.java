@@ -26,17 +26,15 @@
  */
 package be.darnell.mc.FuzzyMessenger;
 
-import be.darnell.mc.FuzzyMessenger.commands.*;
-
 import be.darnell.mc.FuzzyLog.FuzzyLog;
 import be.darnell.mc.FuzzyLog.LogFacility;
-
-import java.io.*;
-
+import be.darnell.mc.FuzzyMessenger.commands.*;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
 
 /**
  * A plugin to handle private messaging
@@ -47,6 +45,7 @@ public final class FuzzyMessenger extends JavaPlugin {
 
     private final FuzzyMessengerListener listener = new FuzzyMessengerListener(this);
 
+    // Map of mutees. String is username in lowercase.
     public MuteManager mm = new MuteManager(getDataFolder());
     protected WordFilter filter = new WordFilter(new File(getDataFolder(), "badwords.txt"), new File(getDataFolder(), "replacements.txt"));
     protected PrivateMessaging pm = new PrivateMessaging(this);
@@ -78,7 +77,7 @@ public final class FuzzyMessenger extends JavaPlugin {
     }
 
     public static void logMessage(String message) {
-        if(useLogger)
+        if (useLogger)
             logger.log(message);
         else
             Bukkit.getServer().getLogger().info(message);

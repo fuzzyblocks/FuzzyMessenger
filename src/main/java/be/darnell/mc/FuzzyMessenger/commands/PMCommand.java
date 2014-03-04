@@ -27,6 +27,7 @@
 package be.darnell.mc.FuzzyMessenger.commands;
 
 import be.darnell.mc.FuzzyMessenger.PrivateMessaging;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -38,12 +39,15 @@ public class PMCommand implements CommandExecutor {
     public PMCommand(PrivateMessaging pm) {
         privateMessaging = pm;
     }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length > 1) {
             String message = PrivateMessaging.constructMessage(args, 1);
             return privateMessaging.sendMessage(sender, args[0], message);
         }
+        sender.sendMessage(ChatColor.GOLD
+                + "Usage: /pm <recipient> <message>");
         return false;
     }
 

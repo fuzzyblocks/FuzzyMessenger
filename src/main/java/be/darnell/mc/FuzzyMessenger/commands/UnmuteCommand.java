@@ -48,7 +48,7 @@ public class UnmuteCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (args.length == 1) {
             Mutee mutee = manager.get(args[0]);
-            if(mutee != null) {
+            if (mutee != null) {
                 return unmute(sender, mutee);
             }
         }
