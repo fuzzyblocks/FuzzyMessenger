@@ -36,13 +36,13 @@ import java.util.Map;
 public class MuteManager {
 
     private File location;
+    private final static String FILE_NAME = "mutees.txt";
+    private Map<String, Mutee> mutees;
 
     public MuteManager(File storageFolder) {
         location = storageFolder;
-        load();
+        mutees = load();
     }
-
-    private Map<String, Mutee> mutees = new HashMap<String, Mutee>();
 
     public boolean isMuted(Player player) {
         return mutees.containsKey(player.getName().toLowerCase());
@@ -65,7 +65,7 @@ public class MuteManager {
     }
 
     public void save() {
-        File muteeFile = new File(location, "mutees.txt");
+        File muteeFile = new File(location, FILE_NAME);
         try {
             ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(muteeFile));
             out.writeObject(mutees);
@@ -76,7 +76,7 @@ public class MuteManager {
 
     @SuppressWarnings("unchecked")
     private HashMap<String, Mutee> load() {
-        File muteeFile = new File(location, "mutees.txt");
+        File muteeFile = new File(location, FILE_NAME);
         try {
             ObjectInputStream in = new ObjectInputStream(new FileInputStream(muteeFile));
             return (HashMap<String, Mutee>) in.readObject();
