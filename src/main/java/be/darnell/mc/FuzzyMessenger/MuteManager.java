@@ -32,6 +32,7 @@ import org.bukkit.entity.Player;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 public class MuteManager {
 
@@ -70,7 +71,7 @@ public class MuteManager {
             ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(muteeFile));
             out.writeObject(mutees);
         } catch (Exception e) {
-            Bukkit.getServer().getLogger().severe("Could not write mutees to file");
+            FuzzyMessenger.logServer(Level.SEVERE, "Could not write mutees to file");
         }
     }
 
@@ -81,7 +82,7 @@ public class MuteManager {
             ObjectInputStream in = new ObjectInputStream(new FileInputStream(muteeFile));
             return (HashMap<String, Mutee>) in.readObject();
         } catch (Exception e) {
-            Bukkit.getServer().getLogger().severe("Could not read mutees from file");
+            FuzzyMessenger.logServer(Level.SEVERE, "Could not read mutees from file");
             return new HashMap<String, Mutee>();
         }
     }

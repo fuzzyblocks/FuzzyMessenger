@@ -26,6 +26,7 @@
  */
 package be.darnell.mc.FuzzyMessenger;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -34,6 +35,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+
+import java.util.logging.Level;
 
 /**
  * @author cedeel
@@ -51,7 +54,8 @@ public final class FuzzyMessengerListener implements Listener {
         if (plugin.mm.isMuted(event.getPlayer())) {
             event.setCancelled(true);
             event.getPlayer().sendMessage(ChatColor.DARK_GRAY + "Nobody hears you");
-            for (Player p : plugin.pm.getSnoopers()) {
+            for (String playerName : plugin.pm.getSnoopers()) {
+                Player p = Bukkit.getServer().getPlayerExact(playerName);
                 p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + event.getPlayer().getDisplayName() + ChatColor.GRAY + ": " + event.getMessage());
             }
         }
@@ -78,7 +82,7 @@ public final class FuzzyMessengerListener implements Listener {
                 }
             } catch (NullPointerException e) {
                 // This should not normally happen.
-                System.out.println("Player not found in snoopers table");
+                FuzzyMessenger.logServer(Level.SEVERE, "Player not found in snoopers table");
             }
         }
     }

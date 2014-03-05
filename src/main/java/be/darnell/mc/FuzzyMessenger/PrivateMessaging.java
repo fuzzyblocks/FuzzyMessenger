@@ -185,9 +185,10 @@ public final class PrivateMessaging {
      * Remove a player from snooping private messages.
      *
      * @param p The player to be removed.
+     * @return True if the player was snooping.
      */
-    public void removeSnooper(Player p) {
-        snoopers.remove(p.getName().toLowerCase());
+    public boolean removeSnooper(Player p) {
+        return snoopers.remove(p.getName().toLowerCase());
     }
 
     public List<String> getSnoopers() {
@@ -206,7 +207,7 @@ public final class PrivateMessaging {
         receiver.sendMessage(introColor + "«" + sender.getDisplayName() + ": " + msgColor + message);
 
         for (String snooper : snoopers) {
-            Player p = Bukkit.getPlayer(snooper);
+            Player p = Bukkit.getPlayerExact(snooper);
             if ((p != sender) && (p != receiver)) {
                 p.sendMessage(snoopColor + sender.getDisplayName() + "»" + receiver.getDisplayName() + ": " + msgColor + message);
             }

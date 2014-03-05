@@ -76,7 +76,7 @@ public class SnoopCommand implements CommandExecutor {
                 return false;
             }
         } else if (sender instanceof ConsoleCommandSender) {
-            sender.sendMessage("No snooping for console :P");
+            sender.sendMessage("No snooping for console.");
             return true;
         }
         return false;
