@@ -24,31 +24,21 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.fuzzyblocks.FuzzyMessenger.commands;
+package net.fuzzyblocks.fuzzymessenger;
 
-import net.fuzzyblocks.FuzzyMessenger.PrivateMessaging;
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
-public class PMCommand implements CommandExecutor {
+public class Mutee {
+    public String playerName;
+    public String displayName;
 
-    private PrivateMessaging privateMessaging;
-
-    public PMCommand(PrivateMessaging pm) {
-        privateMessaging = pm;
+    public Mutee(Player p) {
+        playerName = p.getName();
+        displayName = p.getDisplayName();
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String alias, String[] args) {
-        if (args.length > 1) {
-            String message = PrivateMessaging.constructMessage(args, 1);
-            return privateMessaging.sendMessage(sender, args[0], message);
-        }
-        sender.sendMessage(ChatColor.GOLD
-                + "Usage: /pm <recipient> <message>");
-        return false;
+    public String toString() {
+        return playerName;
     }
-
 }

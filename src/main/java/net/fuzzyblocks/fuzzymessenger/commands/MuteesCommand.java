@@ -24,10 +24,10 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.fuzzyblocks.FuzzyMessenger.commands;
+package net.fuzzyblocks.fuzzymessenger.commands;
 
-import net.fuzzyblocks.FuzzyMessenger.MuteManager;
-import net.fuzzyblocks.FuzzyMessenger.Mutee;
+import net.fuzzyblocks.fuzzymessenger.MuteManager;
+import net.fuzzyblocks.fuzzymessenger.Mutee;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

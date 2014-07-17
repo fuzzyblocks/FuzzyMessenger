@@ -1,5 +1,5 @@
 name: ${name}
-main: net.fuzzyblocks.FuzzyMessenger.FuzzyMessenger
+main: net.fuzzyblocks.fuzzymessenger.FuzzyMessenger
 author: cedeel
 description: A simple plugin for private messaging
 version: ${version}

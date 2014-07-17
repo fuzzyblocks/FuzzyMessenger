@@ -24,11 +24,11 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.fuzzyblocks.FuzzyMessenger;
+package net.fuzzyblocks.fuzzymessenger;
 
 import be.darnell.mc.FuzzyLog.FuzzyLog;
 import be.darnell.mc.FuzzyLog.LogFacility;
-import net.fuzzyblocks.FuzzyMessenger.commands.*;
+import net.fuzzyblocks.fuzzymessenger.commands.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -65,7 +65,7 @@ public final class FuzzyMessenger extends JavaPlugin {
                 FuzzyLog.addFacility("CHAT");
                 logger = FuzzyLog.getFacility("CHAT");
             } else {
-                getServer().getLogger().warning("FuzzyMessenger: useLogger set to true, but FuzzyLog not found!");
+                getServer().getLogger().warning("fuzzymessenger: useLogger set to true, but FuzzyLog not found!");
                 useLogger = false;
             }
         }

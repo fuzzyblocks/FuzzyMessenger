@@ -24,11 +24,11 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.fuzzyblocks.FuzzyMessenger.commands;
+package net.fuzzyblocks.fuzzymessenger.commands;
 
-import net.fuzzyblocks.FuzzyMessenger.FuzzyMessenger;
-import net.fuzzyblocks.FuzzyMessenger.MuteManager;
-import net.fuzzyblocks.FuzzyMessenger.Mutee;
+import net.fuzzyblocks.fuzzymessenger.FuzzyMessenger;
+import net.fuzzyblocks.fuzzymessenger.MuteManager;
+import net.fuzzyblocks.fuzzymessenger.Mutee;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -36,41 +36,40 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class UnmuteCommand implements CommandExecutor {
+public class MuteCommand implements CommandExecutor {
 
     private MuteManager manager;
 
-    public UnmuteCommand(MuteManager mm) {
+    public MuteCommand(MuteManager mm) {
         manager = mm;
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+    public boolean onCommand(CommandSender sender, Command cmd, String alias, String[] args) {
         if (args.length == 1) {
-            Mutee mutee = manager.get(args[0]);
-            if (mutee != null) {
-                return unmute(sender, mutee);
-            }
+            return mute(sender, args[0]);
         }
-        sender.sendMessage(ChatColor.GOLD + "Usage: /unmute <player>");
+
+        sender.sendMessage(ChatColor.GOLD + "Usage: /mute <player>");
         return false;
     }
 
-    private boolean unmute(CommandSender sender, Mutee mutee) {
+    private boolean mute(CommandSender sender, String player) {
         try {
-            if (manager.remove(mutee.playerName)) {
-                FuzzyMessenger.logMessage(mutee.playerName + " was unmuted by " + sender.getName());
-                String muter = sender instanceof Player ? ((Player) sender).getDisplayName() : sender.getName();
+            Mutee mutee = new Mutee(Bukkit.getServer().getPlayer(player));
+            String muter = sender instanceof Player ? ((Player) sender).getDisplayName() : sender.getName();
+            if (manager.add(mutee.playerName)) {
+                FuzzyMessenger.logMessage(mutee + " was muted by " + sender.getName());
                 Bukkit.getServer().broadcastMessage(ChatColor.GRAY + mutee.displayName
-                        + ChatColor.GOLD + " has been unmuted by "
+                        + ChatColor.GOLD + " has been muted by "
                         + ChatColor.GRAY + muter);
-                return true;
             } else {
-                sender.sendMessage(mutee.displayName + " was not muted.");
+                sender.sendMessage(ChatColor.GRAY + mutee.displayName + ChatColor.GOLD + " is already muted.");
             }
-        } catch (Exception e) {
-            sender.sendMessage(mutee.displayName + " not found or not muted.");
+        } catch (NullPointerException e) {
+            sender.sendMessage("Player not found.");
+            return false;
         }
-        return false;
+        return true;
     }
 }

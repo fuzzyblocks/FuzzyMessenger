@@ -24,66 +24,53 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.fuzzyblocks.FuzzyMessenger;
+package net.fuzzyblocks.fuzzymessenger.commands;
 
+import net.fuzzyblocks.fuzzymessenger.FuzzyMessenger;
+import net.fuzzyblocks.fuzzymessenger.MuteManager;
+import net.fuzzyblocks.fuzzymessenger.Mutee;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
+public class UnmuteCommand implements CommandExecutor {
 
-public class MuteManager {
+    private MuteManager manager;
 
-    private File location;
-    private final static String FILE_NAME = "mutees.txt";
-    private Map<String, Mutee> mutees;
-
-    public MuteManager(File storageFolder) {
-        location = storageFolder;
-        mutees = load();
+    public UnmuteCommand(MuteManager mm) {
+        manager = mm;
     }
 
-    public boolean isMuted(Player player) {
-        return mutees.containsKey(player.getName().toLowerCase());
-    }
-
-    public Mutee get(String name) {
-        return mutees.get(name.toLowerCase());
-    }
-
-    public Map<String, Mutee> getAll() {
-        return mutees;
-    }
-
-    public boolean add(String mutee) {
-        return mutees.put(mutee.toLowerCase(), new Mutee(Bukkit.getPlayer(mutee))) == null;
-    }
-
-    public boolean remove(String mutee) {
-        return mutees.remove(mutee.toLowerCase()) != null;
-    }
-
-    public void save() {
-        File muteeFile = new File(location, FILE_NAME);
-        try {
-            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(muteeFile));
-            out.writeObject(mutees);
-        } catch (Exception e) {
-            FuzzyMessenger.logServer(Level.SEVERE, "Could not write mutees to file");
+    @Override
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        if (args.length == 1) {
+            Mutee mutee = manager.get(args[0]);
+            if (mutee != null) {
+                return unmute(sender, mutee);
+            }
         }
+        sender.sendMessage(ChatColor.GOLD + "Usage: /unmute <player>");
+        return false;
     }
 
-    @SuppressWarnings("unchecked")
-    private HashMap<String, Mutee> load() {
-        File muteeFile = new File(location, FILE_NAME);
+    private boolean unmute(CommandSender sender, Mutee mutee) {
         try {
-            ObjectInputStream in = new ObjectInputStream(new FileInputStream(muteeFile));
-            return (HashMap<String, Mutee>) in.readObject();
+            if (manager.remove(mutee.playerName)) {
+                FuzzyMessenger.logMessage(mutee.playerName + " was unmuted by " + sender.getName());
+                String muter = sender instanceof Player ? ((Player) sender).getDisplayName() : sender.getName();
+                Bukkit.getServer().broadcastMessage(ChatColor.GRAY + mutee.displayName
+                        + ChatColor.GOLD + " has been unmuted by "
+                        + ChatColor.GRAY + muter);
+                return true;
+            } else {
+                sender.sendMessage(mutee.displayName + " was not muted.");
+            }
         } catch (Exception e) {
-            FuzzyMessenger.logServer(Level.SEVERE, "Could not read mutees from file");
-            return new HashMap<String, Mutee>();
+            sender.sendMessage(mutee.displayName + " not found or not muted.");
         }
+        return false;
     }
 }

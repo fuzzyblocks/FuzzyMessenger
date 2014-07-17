@@ -24,10 +24,9 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.fuzzyblocks.FuzzyMessenger.commands;
+package net.fuzzyblocks.fuzzymessenger.commands;
 
-import net.fuzzyblocks.FuzzyMessenger.MuteManager;
-import net.fuzzyblocks.FuzzyMessenger.PrivateMessaging;
+import net.fuzzyblocks.fuzzymessenger.MuteManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -35,39 +34,30 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class EmoteCommand implements CommandExecutor {
+public class IsMutedCommand implements CommandExecutor {
 
     private MuteManager manager;
 
-    public EmoteCommand(MuteManager mm) {
+    public IsMutedCommand(MuteManager mm) {
         manager = mm;
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String alias, String... args) {
-        emote(sender, PrivateMessaging.constructMessage(args, 0));
-        return true;
-    }
-
-    private void emote(CommandSender sender, String message) {
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-            if (player.hasPermission("fuzzymessenger.me")) {
-                if (manager.isMuted(player)) {
-                    player.sendMessage(ChatColor.RED + "You can't use emotes while muted.");
-                } else {
-                    Bukkit.getServer().broadcastMessage(ChatColor.DARK_GRAY + "* "
-                            + ChatColor.WHITE + player.getDisplayName()
-                            + " " + message + ChatColor.DARK_GRAY + " *");
-                }
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (args.length == 1) {
+            Player player = Bukkit.getServer().getPlayer(args[0]);
+            if (manager.isMuted(player)) {
+                sender.sendMessage(ChatColor.GRAY + player.getDisplayName()
+                        + ChatColor.GOLD + " is muted.");
             } else {
-                player.sendMessage(ChatColor.RED + "You don't have permission to use emotes.");
+                sender.sendMessage(ChatColor.GRAY + player.getDisplayName()
+                        + ChatColor.GOLD + " is not muted.");
             }
+            return true;
         } else {
-            Bukkit.getServer().broadcastMessage(ChatColor.DARK_GRAY + "* "
-                    + ChatColor.WHITE + "Console "
-                    + message
-                    + ChatColor.DARK_GRAY + " *");
+            sender.sendMessage(ChatColor.GOLD
+                    + "Usage: /ismuted <player>");
+            return false;
         }
     }
 }
