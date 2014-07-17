@@ -24,11 +24,11 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package be.darnell.mc.FuzzyMessenger;
+package net.fuzzyblocks.FuzzyMessenger;
 
 import be.darnell.mc.FuzzyLog.FuzzyLog;
 import be.darnell.mc.FuzzyLog.LogFacility;
-import be.darnell.mc.FuzzyMessenger.commands.*;
+import net.fuzzyblocks.FuzzyMessenger.commands.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -51,8 +51,8 @@ public final class FuzzyMessenger extends JavaPlugin {
     protected WordFilter filter = new WordFilter(new File(getDataFolder(), "badwords.txt"), new File(getDataFolder(), "replacements.txt"));
     protected PrivateMessaging pm = new PrivateMessaging(this);
     private static Logger serverLog;
-    protected static LogFacility logger;
-    protected static boolean useLogger = false;
+    private static LogFacility logger;
+    private static boolean useLogger = false;
 
     @Override
     public void onEnable() {

@@ -24,23 +24,50 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package be.darnell.mc.FuzzyMessenger.commands;
+package net.fuzzyblocks.FuzzyMessenger.commands;
 
-import be.darnell.mc.FuzzyMessenger.PrivateMessaging;
+import net.fuzzyblocks.FuzzyMessenger.MuteManager;
+import net.fuzzyblocks.FuzzyMessenger.PrivateMessaging;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
-public class ReplyCommand implements CommandExecutor {
+public class EmoteCommand implements CommandExecutor {
 
-    private PrivateMessaging privateMessaging;
+    private MuteManager manager;
 
-    public ReplyCommand(PrivateMessaging pm) {
-        privateMessaging = pm;
+    public EmoteCommand(MuteManager mm) {
+        manager = mm;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String alias, String... args) {
-        return args.length >= 1 && privateMessaging.replyMessage(sender, PrivateMessaging.constructMessage(args, 0));
+        emote(sender, PrivateMessaging.constructMessage(args, 0));
+        return true;
+    }
+
+    private void emote(CommandSender sender, String message) {
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            if (player.hasPermission("fuzzymessenger.me")) {
+                if (manager.isMuted(player)) {
+                    player.sendMessage(ChatColor.RED + "You can't use emotes while muted.");
+                } else {
+                    Bukkit.getServer().broadcastMessage(ChatColor.DARK_GRAY + "* "
+                            + ChatColor.WHITE + player.getDisplayName()
+                            + " " + message + ChatColor.DARK_GRAY + " *");
+                }
+            } else {
+                player.sendMessage(ChatColor.RED + "You don't have permission to use emotes.");
+            }
+        } else {
+            Bukkit.getServer().broadcastMessage(ChatColor.DARK_GRAY + "* "
+                    + ChatColor.WHITE + "Console "
+                    + message
+                    + ChatColor.DARK_GRAY + " *");
+        }
     }
 }

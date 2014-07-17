@@ -24,10 +24,11 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package be.darnell.mc.FuzzyMessenger.commands;
+package net.fuzzyblocks.FuzzyMessenger.commands;
 
-import be.darnell.mc.FuzzyMessenger.MuteManager;
-import be.darnell.mc.FuzzyMessenger.PrivateMessaging;
+import net.fuzzyblocks.FuzzyMessenger.FuzzyMessenger;
+import net.fuzzyblocks.FuzzyMessenger.MuteManager;
+import net.fuzzyblocks.FuzzyMessenger.Mutee;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -35,39 +36,41 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class EmoteCommand implements CommandExecutor {
+public class UnmuteCommand implements CommandExecutor {
 
     private MuteManager manager;
 
-    public EmoteCommand(MuteManager mm) {
+    public UnmuteCommand(MuteManager mm) {
         manager = mm;
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String alias, String... args) {
-        emote(sender, PrivateMessaging.constructMessage(args, 0));
-        return true;
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        if (args.length == 1) {
+            Mutee mutee = manager.get(args[0]);
+            if (mutee != null) {
+                return unmute(sender, mutee);
+            }
+        }
+        sender.sendMessage(ChatColor.GOLD + "Usage: /unmute <player>");
+        return false;
     }
 
-    private void emote(CommandSender sender, String message) {
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-            if (player.hasPermission("fuzzymessenger.me")) {
-                if (manager.isMuted(player)) {
-                    player.sendMessage(ChatColor.RED + "You can't use emotes while muted.");
-                } else {
-                    Bukkit.getServer().broadcastMessage(ChatColor.DARK_GRAY + "* "
-                            + ChatColor.WHITE + player.getDisplayName()
-                            + " " + message + ChatColor.DARK_GRAY + " *");
-                }
+    private boolean unmute(CommandSender sender, Mutee mutee) {
+        try {
+            if (manager.remove(mutee.playerName)) {
+                FuzzyMessenger.logMessage(mutee.playerName + " was unmuted by " + sender.getName());
+                String muter = sender instanceof Player ? ((Player) sender).getDisplayName() : sender.getName();
+                Bukkit.getServer().broadcastMessage(ChatColor.GRAY + mutee.displayName
+                        + ChatColor.GOLD + " has been unmuted by "
+                        + ChatColor.GRAY + muter);
+                return true;
             } else {
-                player.sendMessage(ChatColor.RED + "You don't have permission to use emotes.");
+                sender.sendMessage(mutee.displayName + " was not muted.");
             }
-        } else {
-            Bukkit.getServer().broadcastMessage(ChatColor.DARK_GRAY + "* "
-                    + ChatColor.WHITE + "Console "
-                    + message
-                    + ChatColor.DARK_GRAY + " *");
+        } catch (Exception e) {
+            sender.sendMessage(mutee.displayName + " not found or not muted.");
         }
+        return false;
     }
 }

@@ -24,52 +24,23 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package be.darnell.mc.FuzzyMessenger.commands;
+package net.fuzzyblocks.FuzzyMessenger.commands;
 
-import be.darnell.mc.FuzzyMessenger.FuzzyMessenger;
-import be.darnell.mc.FuzzyMessenger.MuteManager;
-import be.darnell.mc.FuzzyMessenger.Mutee;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import net.fuzzyblocks.FuzzyMessenger.PrivateMessaging;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
-public class MuteCommand implements CommandExecutor {
+public class ReplyCommand implements CommandExecutor {
 
-    private MuteManager manager;
+    private PrivateMessaging privateMessaging;
 
-    public MuteCommand(MuteManager mm) {
-        manager = mm;
+    public ReplyCommand(PrivateMessaging pm) {
+        privateMessaging = pm;
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String alias, String[] args) {
-        if (args.length == 1) {
-            return mute(sender, args[0]);
-        }
-
-        sender.sendMessage(ChatColor.GOLD + "Usage: /mute <player>");
-        return false;
-    }
-
-    private boolean mute(CommandSender sender, String player) {
-        try {
-            Mutee mutee = new Mutee(Bukkit.getServer().getPlayer(player));
-            String muter = sender instanceof Player ? ((Player) sender).getDisplayName() : sender.getName();
-            if (manager.add(mutee.playerName)) {
-                FuzzyMessenger.logMessage(mutee + " was muted by " + sender.getName());
-                Bukkit.getServer().broadcastMessage(ChatColor.GRAY + mutee.displayName
-                        + ChatColor.GOLD + " has been muted by "
-                        + ChatColor.GRAY + muter);
-            } else {
-                sender.sendMessage(ChatColor.GRAY + mutee.displayName + ChatColor.GOLD + " is already muted.");
-            }
-        } catch (NullPointerException e) {
-            sender.sendMessage("Player not found.");
-            return false;
-        }
-        return true;
+    public boolean onCommand(CommandSender sender, Command command, String alias, String... args) {
+        return args.length >= 1 && privateMessaging.replyMessage(sender, PrivateMessaging.constructMessage(args, 0));
     }
 }

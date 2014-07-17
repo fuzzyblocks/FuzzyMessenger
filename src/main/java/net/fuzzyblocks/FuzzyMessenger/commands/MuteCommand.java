@@ -24,9 +24,11 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package be.darnell.mc.FuzzyMessenger.commands;
+package net.fuzzyblocks.FuzzyMessenger.commands;
 
-import be.darnell.mc.FuzzyMessenger.MuteManager;
+import net.fuzzyblocks.FuzzyMessenger.FuzzyMessenger;
+import net.fuzzyblocks.FuzzyMessenger.MuteManager;
+import net.fuzzyblocks.FuzzyMessenger.Mutee;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -34,30 +36,40 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class IsMutedCommand implements CommandExecutor {
+public class MuteCommand implements CommandExecutor {
 
     private MuteManager manager;
 
-    public IsMutedCommand(MuteManager mm) {
+    public MuteCommand(MuteManager mm) {
         manager = mm;
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(CommandSender sender, Command cmd, String alias, String[] args) {
         if (args.length == 1) {
-            Player player = Bukkit.getServer().getPlayer(args[0]);
-            if (manager.isMuted(player)) {
-                sender.sendMessage(ChatColor.GRAY + player.getDisplayName()
-                        + ChatColor.GOLD + " is muted.");
+            return mute(sender, args[0]);
+        }
+
+        sender.sendMessage(ChatColor.GOLD + "Usage: /mute <player>");
+        return false;
+    }
+
+    private boolean mute(CommandSender sender, String player) {
+        try {
+            Mutee mutee = new Mutee(Bukkit.getServer().getPlayer(player));
+            String muter = sender instanceof Player ? ((Player) sender).getDisplayName() : sender.getName();
+            if (manager.add(mutee.playerName)) {
+                FuzzyMessenger.logMessage(mutee + " was muted by " + sender.getName());
+                Bukkit.getServer().broadcastMessage(ChatColor.GRAY + mutee.displayName
+                        + ChatColor.GOLD + " has been muted by "
+                        + ChatColor.GRAY + muter);
             } else {
-                sender.sendMessage(ChatColor.GRAY + player.getDisplayName()
-                        + ChatColor.GOLD + " is not muted.");
+                sender.sendMessage(ChatColor.GRAY + mutee.displayName + ChatColor.GOLD + " is already muted.");
             }
-            return true;
-        } else {
-            sender.sendMessage(ChatColor.GOLD
-                    + "Usage: /ismuted <player>");
+        } catch (NullPointerException e) {
+            sender.sendMessage("Player not found.");
             return false;
         }
+        return true;
     }
 }

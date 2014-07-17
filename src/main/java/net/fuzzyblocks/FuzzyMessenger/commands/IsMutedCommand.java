@@ -24,39 +24,40 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package be.darnell.mc.FuzzyMessenger.commands;
+package net.fuzzyblocks.FuzzyMessenger.commands;
 
-import be.darnell.mc.FuzzyMessenger.MuteManager;
-import be.darnell.mc.FuzzyMessenger.Mutee;
+import net.fuzzyblocks.FuzzyMessenger.MuteManager;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
-public class MuteesCommand implements CommandExecutor {
+public class IsMutedCommand implements CommandExecutor {
 
     private MuteManager manager;
 
-    public MuteesCommand(MuteManager mm) {
+    public IsMutedCommand(MuteManager mm) {
         manager = mm;
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String alias, String[] args) {
-        if (sender.hasPermission("fuzzymessenger.mute")) {
-            sender.sendMessage(ChatColor.GOLD + "Muted players:");
-            StringBuilder sb = new StringBuilder(48);
-            sb.append(ChatColor.GRAY);
-            try {
-                for (Mutee mutee : manager.getAll().values()) {
-                    sb.append(mutee.playerName).append(", ");
-                }
-            } catch (NullPointerException ignored) {
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (args.length == 1) {
+            Player player = Bukkit.getServer().getPlayer(args[0]);
+            if (manager.isMuted(player)) {
+                sender.sendMessage(ChatColor.GRAY + player.getDisplayName()
+                        + ChatColor.GOLD + " is muted.");
+            } else {
+                sender.sendMessage(ChatColor.GRAY + player.getDisplayName()
+                        + ChatColor.GOLD + " is not muted.");
             }
-            sender.sendMessage(sb.toString().replaceAll(", $", ""));
             return true;
+        } else {
+            sender.sendMessage(ChatColor.GOLD
+                    + "Usage: /ismuted <player>");
+            return false;
         }
-        sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
-        return false;
     }
 }

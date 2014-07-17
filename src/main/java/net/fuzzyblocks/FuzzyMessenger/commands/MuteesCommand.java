@@ -24,31 +24,39 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package be.darnell.mc.FuzzyMessenger.commands;
+package net.fuzzyblocks.FuzzyMessenger.commands;
 
-import be.darnell.mc.FuzzyMessenger.PrivateMessaging;
+import net.fuzzyblocks.FuzzyMessenger.MuteManager;
+import net.fuzzyblocks.FuzzyMessenger.Mutee;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-public class PMCommand implements CommandExecutor {
+public class MuteesCommand implements CommandExecutor {
 
-    private PrivateMessaging privateMessaging;
+    private MuteManager manager;
 
-    public PMCommand(PrivateMessaging pm) {
-        privateMessaging = pm;
+    public MuteesCommand(MuteManager mm) {
+        manager = mm;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String alias, String[] args) {
-        if (args.length > 1) {
-            String message = PrivateMessaging.constructMessage(args, 1);
-            return privateMessaging.sendMessage(sender, args[0], message);
+        if (sender.hasPermission("fuzzymessenger.mute")) {
+            sender.sendMessage(ChatColor.GOLD + "Muted players:");
+            StringBuilder sb = new StringBuilder(48);
+            sb.append(ChatColor.GRAY);
+            try {
+                for (Mutee mutee : manager.getAll().values()) {
+                    sb.append(mutee.playerName).append(", ");
+                }
+            } catch (NullPointerException ignored) {
+            }
+            sender.sendMessage(sb.toString().replaceAll(", $", ""));
+            return true;
         }
-        sender.sendMessage(ChatColor.GOLD
-                + "Usage: /pm <recipient> <message>");
+        sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
         return false;
     }
-
 }
