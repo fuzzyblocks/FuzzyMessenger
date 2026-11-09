@@ -2,7 +2,7 @@
 # https://docs.gradle.org/current/userguide/version_catalogs.html#sec::toml-dependencies-format
 
 [versions]
-be-darnell-fuzzylog = "1.1"
+be-darnell-fuzzylog = "1.2-SNAPSHOT"
 org-bukkit-bukkit = "1.5.2-R1.0"
 
 [libraries]

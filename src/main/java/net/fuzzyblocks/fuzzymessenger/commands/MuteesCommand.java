@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 - 2014 Chris Darnell (cedeel).
+ * Copyright (c) 2012 - 2026 Chris Darnell (cedeel).
  * All rights reserved.
  *
  *
@@ -28,7 +28,9 @@ package net.fuzzyblocks.fuzzymessenger.commands;
 
 import net.fuzzyblocks.fuzzymessenger.MuteManager;
 import net.fuzzyblocks.fuzzymessenger.Mutee;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -44,19 +46,27 @@ public class MuteesCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String alias, String[] args) {
         if (sender.hasPermission("fuzzymessenger.mute")) {
-            sender.sendMessage(ChatColor.GOLD + "Muted players:");
+            sender.sendMessage(
+                Component.text("Muted players:")
+                .color(NamedTextColor.GOLD)
+            );
             StringBuilder sb = new StringBuilder(48);
-            sb.append(ChatColor.GRAY);
             try {
                 for (Mutee mutee : manager.getAll().values()) {
                     sb.append(mutee.playerName).append(", ");
                 }
             } catch (NullPointerException ignored) {
             }
-            sender.sendMessage(sb.toString().replaceAll(", $", ""));
+            sender.sendMessage(
+                Component.text(sb.toString().replaceAll(", $", ""))
+                .color(NamedTextColor.GRAY)
+            );
             return true;
         }
-        sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
+        sender.sendMessage(
+            Component.text("You don't have permission to use this command.")
+            .color(NamedTextColor.RED)
+        );
         return false;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 - 2014 Chris Darnell (cedeel).
+ * Copyright (c) 2012 - 2026 Chris Darnell (cedeel).
  * All rights reserved.
  * 
  *
@@ -27,10 +27,12 @@
 package net.fuzzyblocks.fuzzymessenger;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,10 +43,10 @@ import java.util.List;
  */
 public final class PrivateMessaging {
 
-    private ChatColor introColor = ChatColor.DARK_GRAY;
-    private ChatColor snoopColor = ChatColor.DARK_GREEN;
-    private ChatColor msgColor = ChatColor.ITALIC;
-    private ChatColor warnColor = ChatColor.RED;
+    private NamedTextColor introColor = NamedTextColor.DARK_GRAY;
+    private NamedTextColor snoopColor = NamedTextColor.DARK_GREEN;
+    private TextDecoration msgColor = TextDecoration.ITALIC;
+    private NamedTextColor warnColor = NamedTextColor.RED;
     private static FuzzyMessenger plugin;
     private HashMap<String, String> pairs; // 2 names
     private List<String> snoopers;
@@ -81,7 +83,7 @@ public final class PrivateMessaging {
                     }
 
                 } else { // If recipient is console
-                    System.out.println("«" + player.getDisplayName() + ": " + message);
+                    System.out.println("«" + player.displayName().toString() + ": " + message);
                     sender.sendMessage(introColor + "»CONSOLE: " + msgColor + message);
                     logMessage(sender.getName(), "CONSOLE", message);
                     destination = "console";
@@ -97,7 +99,7 @@ public final class PrivateMessaging {
         } else if (sender instanceof ConsoleCommandSender) {
             try {
                 Player receiver = plugin.getServer().getPlayer(recipient);
-                System.out.println("»" + receiver.getDisplayName() + ": " + message);
+                System.out.println("»" + receiver.displayName().toString() + ": " + message);
                 receiver.sendMessage(introColor + "«CONSOLE: " + msgColor + message);
                 logMessage("CONSOLE", receiver.getName(), message);
                 pairs.put(receiver.getName(), "console");
@@ -125,7 +127,7 @@ public final class PrivateMessaging {
                 try {
                     recipient = pairs.get(player.getName()); // This is what might generate a NullPointerException.
                     if (recipient.equalsIgnoreCase("console")) {
-                        System.out.println("«" + player.getDisplayName() + ": " + message);
+                        System.out.println("«" + player.displayName().toString() + ": " + message);
                         sender.sendMessage(introColor + "»CONSOLE: " + msgColor + message);
                         logMessage(player.getName(), "CONSOLE", message);
                         return true;
@@ -150,7 +152,7 @@ public final class PrivateMessaging {
         else if (sender instanceof ConsoleCommandSender) {
             try {
                 Player receiver = plugin.getServer().getPlayer(pairs.get("console"));
-                System.out.println("»" + receiver.getDisplayName() + ": " + message);
+                System.out.println("»" + receiver.displayName().toString() + ": " + message);
                 receiver.sendMessage(introColor + "«CONSOLE: " + msgColor + message);
                 logMessage("CONSOLE", receiver.getName(), message);
                 pairs.put(receiver.getName(), "console");
@@ -203,13 +205,13 @@ public final class PrivateMessaging {
      * @param receiver The receiver of the message.
      */
     private void fireMessage(String message, Player sender, Player receiver) {
-        sender.sendMessage(introColor + "»" + receiver.getDisplayName() + ": " + msgColor + message);
-        receiver.sendMessage(introColor + "«" + sender.getDisplayName() + ": " + msgColor + message);
+        sender.sendMessage(introColor + "»" + receiver.displayName().toString() + ": " + msgColor + message);
+        receiver.sendMessage(introColor + "«" + sender.displayName().toString() + ": " + msgColor + message);
 
         for (String snooper : snoopers) {
             Player p = Bukkit.getPlayerExact(snooper);
             if ((p != sender) && (p != receiver)) {
-                p.sendMessage(snoopColor + sender.getDisplayName() + "»" + receiver.getDisplayName() + ": " + msgColor + message);
+                p.sendMessage(snoopColor + sender.displayName().toString() + "»" + receiver.displayName().toString() + ": " + msgColor + message);
             }
         }
 

@@ -1,5 +1,6 @@
 name: ${name}
 main: net.fuzzyblocks.fuzzymessenger.FuzzyMessenger
+api-version: '1.20'
 author: cedeel
 description: A simple plugin for private messaging
 version: ${version}

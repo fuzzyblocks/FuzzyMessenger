@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 - 2014 Chris Darnell (cedeel).
+ * Copyright (c) 2012 - 2026 Chris Darnell (cedeel).
  * All rights reserved.
  *
  *
@@ -40,7 +40,7 @@ public class ReplyCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String alias, String... args) {
+    public boolean onCommand(CommandSender sender, Command command, String alias, String[] args) {
         return args.length >= 1 && privateMessaging.replyMessage(sender, PrivateMessaging.constructMessage(args, 0));
     }
 }

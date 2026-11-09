@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 - 2014 Chris Darnell (cedeel).
+ * Copyright (c) 2012 - 2026 Chris Darnell (cedeel).
  * All rights reserved.
  *
  *
@@ -27,7 +27,9 @@
 package net.fuzzyblocks.fuzzymessenger.commands;
 
 import net.fuzzyblocks.fuzzymessenger.PrivateMessaging;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -46,8 +48,10 @@ public class PMCommand implements CommandExecutor {
             String message = PrivateMessaging.constructMessage(args, 1);
             return privateMessaging.sendMessage(sender, args[0], message);
         }
-        sender.sendMessage(ChatColor.GOLD
-                + "Usage: /pm <recipient> <message>");
+        sender.sendMessage(
+            Component.text("Usage: /pm <recipient> <message>")
+            .color(NamedTextColor.GOLD)
+        );
         return false;
     }
 

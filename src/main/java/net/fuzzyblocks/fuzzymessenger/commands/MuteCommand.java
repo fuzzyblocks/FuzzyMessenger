@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 - 2014 Chris Darnell (cedeel).
+ * Copyright (c) 2012 - 2026 Chris Darnell (cedeel).
  * All rights reserved.
  *
  *
@@ -29,8 +29,10 @@ package net.fuzzyblocks.fuzzymessenger.commands;
 import net.fuzzyblocks.fuzzymessenger.FuzzyMessenger;
 import net.fuzzyblocks.fuzzymessenger.MuteManager;
 import net.fuzzyblocks.fuzzymessenger.Mutee;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -50,21 +52,25 @@ public class MuteCommand implements CommandExecutor {
             return mute(sender, args[0]);
         }
 
-        sender.sendMessage(ChatColor.GOLD + "Usage: /mute <player>");
+        sender.sendMessage(
+            Component.text("Usage: /mute <player>", NamedTextColor.GOLD)
+        );
         return false;
     }
 
     private boolean mute(CommandSender sender, String player) {
         try {
             Mutee mutee = new Mutee(Bukkit.getServer().getPlayer(player));
-            String muter = sender instanceof Player ? ((Player) sender).getDisplayName() : sender.getName();
             if (manager.add(mutee.playerName)) {
                 FuzzyMessenger.logMessage(mutee + " was muted by " + sender.getName());
-                Bukkit.getServer().broadcastMessage(ChatColor.GRAY + mutee.displayName
-                        + ChatColor.GOLD + " has been muted by "
-                        + ChatColor.GRAY + muter);
+                Component broadcastMessage = Component.text(mutee.displayName, NamedTextColor.GRAY)
+                    .append(Component.text(" has been muted by ", NamedTextColor.GOLD))
+                    .append(sender instanceof Player ? ((Player) sender).displayName() : sender.name()).color(NamedTextColor.GRAY);
+                Bukkit.getServer().broadcast(broadcastMessage);
             } else {
-                sender.sendMessage(ChatColor.GRAY + mutee.displayName + ChatColor.GOLD + " is already muted.");
+                sender.sendMessage(Component.text(mutee.displayName, NamedTextColor.GRAY)
+                    .append(Component.text(" is already muted.", NamedTextColor.GOLD))
+            );
             }
         } catch (NullPointerException e) {
             sender.sendMessage("Player not found.");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 - 2014 Chris Darnell (cedeel).
+ * Copyright (c) 2012 - 2026 Chris Darnell (cedeel).
  * All rights reserved.
  *
  *
@@ -70,6 +70,7 @@ public class MuteManager {
         try {
             ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(muteeFile));
             out.writeObject(mutees);
+            out.close();
         } catch (Exception e) {
             FuzzyMessenger.logServer(Level.SEVERE, "Could not write mutees to file");
         }
@@ -80,7 +81,9 @@ public class MuteManager {
         File muteeFile = new File(location, FILE_NAME);
         try {
             ObjectInputStream in = new ObjectInputStream(new FileInputStream(muteeFile));
-            return (HashMap<String, Mutee>) in.readObject();
+            HashMap<String, Mutee> res = (HashMap<String, Mutee>) in.readObject();
+            in.close();
+            return res;
         } catch (Exception e) {
             FuzzyMessenger.logServer(Level.SEVERE, "Could not read mutees from file");
             return new HashMap<String, Mutee>();

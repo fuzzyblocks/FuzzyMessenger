@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 - 2014 Chris Darnell (cedeel).
+ * Copyright (c) 2012 - 2026 Chris Darnell (cedeel).
  * All rights reserved.
  * 
  *
@@ -26,11 +26,11 @@
  */
 package net.fuzzyblocks.fuzzymessenger;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
+import java.nio.file.Files;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -45,13 +45,13 @@ public class WordFilter {
 
     public WordFilter(File badWordFile, File replacementFile) {
         try {
-            badWords = new HashSet<String>(Files.readLines(badWordFile, Charsets.UTF_8));
+            badWords = new HashSet<>(Files.readAllLines(badWordFile.toPath(), StandardCharsets.UTF_8));
         } catch (IOException ex) {
             FuzzyMessenger.logServer(Level.WARNING, "badwords.txt not found.");
         }
 
         try {
-            replacementWords = Files.readLines(replacementFile, Charsets.UTF_8);
+            replacementWords = Files.readAllLines(replacementFile.toPath(), StandardCharsets.UTF_8);
         } catch (IOException e) {
             FuzzyMessenger.logServer(Level.WARNING, "replacements.txt not found.");
         }

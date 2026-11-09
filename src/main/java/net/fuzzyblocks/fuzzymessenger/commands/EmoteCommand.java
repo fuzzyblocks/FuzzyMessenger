@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 - 2014 Chris Darnell (cedeel).
+ * Copyright (c) 2012 - 2026 Chris Darnell (cedeel).
  * All rights reserved.
  *
  *
@@ -28,8 +28,11 @@ package net.fuzzyblocks.fuzzymessenger.commands;
 
 import net.fuzzyblocks.fuzzymessenger.MuteManager;
 import net.fuzzyblocks.fuzzymessenger.PrivateMessaging;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -44,7 +47,7 @@ public class EmoteCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String alias, String... args) {
+    public boolean onCommand(CommandSender sender, Command command, String alias, String[] args) {
         emote(sender, PrivateMessaging.constructMessage(args, 0));
         return true;
     }
@@ -54,20 +57,26 @@ public class EmoteCommand implements CommandExecutor {
             Player player = (Player) sender;
             if (player.hasPermission("fuzzymessenger.me")) {
                 if (manager.isMuted(player)) {
-                    player.sendMessage(ChatColor.RED + "You can't use emotes while muted.");
+                    player.sendMessage(Component.text("You can't use emotes while muted.", NamedTextColor.RED));
                 } else {
-                    Bukkit.getServer().broadcastMessage(ChatColor.DARK_GRAY + "* "
-                            + ChatColor.WHITE + player.getDisplayName()
-                            + " " + message + ChatColor.DARK_GRAY + " *");
+                    // Bukkit.getServer().broadcastMessage(ChatColor.DARK_GRAY + "* "
+                            // + ChatColor.WHITE + player.displayName().toString()
+                            // + " " + message + ChatColor.DARK_GRAY + " *");
+                    final TextComponent broadcastMessage = Component.text("* ", NamedTextColor.DARK_GRAY)
+                    .append(player.displayName().color(NamedTextColor.WHITE))
+                    .append(Component.text(" " + message, NamedTextColor.WHITE))
+                    .append(Component.text(" *", NamedTextColor.DARK_GRAY));
+
+                    Bukkit.getServer().broadcast(broadcastMessage);
                 }
             } else {
-                player.sendMessage(ChatColor.RED + "You don't have permission to use emotes.");
+                player.sendMessage(Component.text("You don't have permission to use emotes.", NamedTextColor.RED));
             }
         } else {
-            Bukkit.getServer().broadcastMessage(ChatColor.DARK_GRAY + "* "
-                    + ChatColor.WHITE + "Console "
-                    + message
-                    + ChatColor.DARK_GRAY + " *");
+            final TextComponent broadcastMessage = Component.text("* ", NamedTextColor.DARK_GRAY)
+                .append(Component.text("Console " + message, NamedTextColor.WHITE))
+                .append(Component.text(" *", NamedTextColor.DARK_GRAY));
+            Bukkit.getServer().broadcast(broadcastMessage);
         }
     }
 }

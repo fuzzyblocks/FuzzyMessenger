@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 - 2014 Chris Darnell (cedeel).
+ * Copyright (c) 2012 - 2026 Chris Darnell (cedeel).
  * All rights reserved.
  *
  *
@@ -27,8 +27,10 @@
 package net.fuzzyblocks.fuzzymessenger.commands;
 
 import net.fuzzyblocks.fuzzymessenger.MuteManager;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -47,16 +49,21 @@ public class IsMutedCommand implements CommandExecutor {
         if (args.length == 1) {
             Player player = Bukkit.getServer().getPlayer(args[0]);
             if (manager.isMuted(player)) {
-                sender.sendMessage(ChatColor.GRAY + player.getDisplayName()
-                        + ChatColor.GOLD + " is muted.");
+                sender.sendMessage(
+                    player.displayName().color(NamedTextColor.GRAY)
+                    .append(Component.text(" is muted.", NamedTextColor.GOLD))
+                );
             } else {
-                sender.sendMessage(ChatColor.GRAY + player.getDisplayName()
-                        + ChatColor.GOLD + " is not muted.");
+                sender.sendMessage(
+                    player.displayName().color(NamedTextColor.GRAY)
+                    .append(Component.text(" is not muted.", NamedTextColor.GOLD))
+                );
             }
             return true;
         } else {
-            sender.sendMessage(ChatColor.GOLD
-                    + "Usage: /ismuted <player>");
+            sender.sendMessage(
+                Component.text("Usage: /ismuted <player>", NamedTextColor.GOLD)
+            );
             return false;
         }
     }

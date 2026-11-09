@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 - 2014 Chris Darnell (cedeel).
+ * Copyright (c) 2012 - 2026 Chris Darnell (cedeel).
  * All rights reserved.
  *
  *
@@ -27,6 +27,7 @@
 package net.fuzzyblocks.fuzzymessenger;
 
 import org.bukkit.entity.Player;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public class Mutee {
     public String playerName;
@@ -34,7 +35,7 @@ public class Mutee {
 
     public Mutee(Player p) {
         playerName = p.getName();
-        displayName = p.getDisplayName();
+        displayName = PlainTextComponentSerializer.plainText().serialize(p.displayName());
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 - 2014 Chris Darnell (cedeel).
+ * Copyright (c) 2012 - 2026 Chris Darnell (cedeel).
  * All rights reserved.
  *
  *
@@ -29,8 +29,10 @@ package net.fuzzyblocks.fuzzymessenger.commands;
 import net.fuzzyblocks.fuzzymessenger.FuzzyMessenger;
 import net.fuzzyblocks.fuzzymessenger.MuteManager;
 import net.fuzzyblocks.fuzzymessenger.Mutee;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -52,18 +54,19 @@ public class UnmuteCommand implements CommandExecutor {
                 return unmute(sender, mutee);
             }
         }
-        sender.sendMessage(ChatColor.GOLD + "Usage: /unmute <player>");
+        sender.sendMessage(Component.text("Usage: /unmute <player>").color(NamedTextColor.GOLD));
         return false;
     }
 
     private boolean unmute(CommandSender sender, Mutee mutee) {
         try {
             if (manager.remove(mutee.playerName)) {
-                FuzzyMessenger.logMessage(mutee.playerName + " was unmuted by " + sender.getName());
-                String muter = sender instanceof Player ? ((Player) sender).getDisplayName() : sender.getName();
-                Bukkit.getServer().broadcastMessage(ChatColor.GRAY + mutee.displayName
-                        + ChatColor.GOLD + " has been unmuted by "
-                        + ChatColor.GRAY + muter);
+                FuzzyMessenger.logMessage(mutee + " was unmuted by " + sender.getName());
+                Component unmuteMessage = Component.text(
+                    mutee.displayName).color(NamedTextColor.GRAY)
+                    .append(Component.text(" has been unmuted by ").color(NamedTextColor.GOLD))
+                    .append(sender instanceof Player ? ((Player) sender).displayName() : sender.name()).color(NamedTextColor.GRAY);
+                Bukkit.getServer().broadcast(unmuteMessage);
                 return true;
             } else {
                 sender.sendMessage(mutee.displayName + " was not muted.");

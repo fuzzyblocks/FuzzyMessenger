@@ -27,14 +27,18 @@
 package net.fuzzyblocks.fuzzymessenger;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
 
 import java.util.logging.Level;
 
@@ -50,25 +54,34 @@ public final class FuzzyMessengerListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
+    public void onAsyncPlayerChat(AsyncChatEvent event) {
         if (plugin.mm.isMuted(event.getPlayer())) {
             event.setCancelled(true);
-            event.getPlayer().sendMessage(ChatColor.DARK_GRAY + "Nobody hears you");
+            event.getPlayer().sendMessage(Component.text("Nobody hears you", NamedTextColor.DARK_GRAY));
             for (String playerName : plugin.pm.getSnoopers()) {
                 Player p = Bukkit.getServer().getPlayerExact(playerName);
-                p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + event.getPlayer().getDisplayName() + ChatColor.GRAY + ": " + event.getMessage());
+                final Style style = Style.style(NamedTextColor.GRAY, TextDecoration.ITALIC);
+                p.sendMessage(
+                    event.getPlayer().displayName().style(style)
+                    .append(Component.text(": ", NamedTextColor.GRAY))
+                    .append(event.message().color(NamedTextColor.GRAY))
+                );
             }
         }
         if (!event.getPlayer().hasPermission("fuzzymessenger.filter.bypass")) {
-            event.setMessage(plugin.filter.filter(event.getMessage()));
+            event.message(Component.text(plugin.filter.filter(event.message().toString())));
         }
     }
 
     @EventHandler
-    public void onPlayerLogin(PlayerLoginEvent event) {
+    public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        if (player.hasPermission("fuzzymessenger.pm.snoop")) {
-            plugin.pm.addSnooper(player);
+        if(!player.hasPermission("fuzzymessenger.pm.snoop")) {
+            return;
+        } else {
+            player.getScheduler().run(plugin, task -> {
+                plugin.pm.addSnooper(player);
+            }, null);
         }
     }
 

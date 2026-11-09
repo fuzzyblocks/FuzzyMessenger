@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 - 2014 Chris Darnell (cedeel).
+ * Copyright (c) 2012 - 2026 Chris Darnell (cedeel).
  * All rights reserved.
  *
  *
@@ -27,7 +27,9 @@
 package net.fuzzyblocks.fuzzymessenger.commands;
 
 import net.fuzzyblocks.fuzzymessenger.PrivateMessaging;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -52,23 +54,27 @@ public class SnoopCommand implements CommandExecutor {
                         if (!pm.isSnooper(player)) {
                             pm.addSnooper(player);
                             sender.sendMessage(
-                                    ChatColor.GREEN
-                                            + "PM snooping enabled.");
+                                    Component.text("PM snooping enabled.")
+                                    .color(NamedTextColor.GREEN)
+                            );
                         } else {
                             player.sendMessage(
-                                    ChatColor.YELLOW
-                                            + "PM snooping already enabled.");
+                                    Component.text("PM snooping already enabled.")
+                                    .color(NamedTextColor.YELLOW)
+                            );
                         }
                     } else if (args[0].equalsIgnoreCase("off")) {
                         if (pm.isSnooper(player)) {
                             pm.removeSnooper(player);
                             sender.sendMessage(
-                                    ChatColor.GREEN
-                                            + "PM snooping disabled.");
+                                Component.text("PM snooping disabled.")
+                                .color(NamedTextColor.GREEN)
+                            );
                         } else {
                             player.sendMessage(
-                                    ChatColor.YELLOW
-                                            + "PM snooping not enabled.");
+                                Component.text("PM snooping not enabled.")
+                                .color(NamedTextColor.YELLOW)
+                            );
                         }
                     }
                     return true;

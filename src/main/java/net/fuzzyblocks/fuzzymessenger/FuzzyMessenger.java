@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 - 2014 Chris Darnell (cedeel).
+ * Copyright (c) 2012 - 2026 Chris Darnell (cedeel).
  * All rights reserved.
  * 
  *
@@ -47,9 +47,9 @@ public final class FuzzyMessenger extends JavaPlugin {
     private final FuzzyMessengerListener listener = new FuzzyMessengerListener(this);
 
     // Map of mutees. String is username in lowercase.
-    public MuteManager mm = new MuteManager(getDataFolder());
-    protected WordFilter filter = new WordFilter(new File(getDataFolder(), "badwords.txt"), new File(getDataFolder(), "replacements.txt"));
-    protected PrivateMessaging pm = new PrivateMessaging(this);
+    public MuteManager mm;
+    protected WordFilter filter;
+    protected PrivateMessaging pm;
     private static Logger serverLog;
     private static LogFacility logger;
     private static boolean useLogger = false;
@@ -69,7 +69,13 @@ public final class FuzzyMessenger extends JavaPlugin {
                 useLogger = false;
             }
         }
+        
         serverLog = getLogger();
+        
+        mm = new MuteManager(getDataFolder());
+        filter = new WordFilter(new File(getDataFolder(), "badwords.txt"), new File(getDataFolder(), "replacements.txt"));
+        pm = new PrivateMessaging(this);
+
         registerCommands();
     }
 
